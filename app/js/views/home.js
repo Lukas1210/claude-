@@ -7,6 +7,8 @@ import { entryHero, emptyState, hearts } from '../ui/components.js';
 import { heartRain } from '../ui/fx.js';
 import { coverOf } from '../photos.js';
 import { openAddMenu } from '../main.js';
+import { upcoming, eventCat, fmtWhen, countdownText, expandEvents } from '../events.js';
+import { shortPlace } from '../geo.js';
 
 const DAY_MILESTONES = (() => {
   const s = new Set([100, 200, 300, 500, 666, 777, 888]);
@@ -113,6 +115,11 @@ export function render(el) {
   const dev = getDevice();
   const showInstall = !isStandalone() && !dev.installHintDismissed;
   const cds = countdowns().slice(0, 6);
+  const nextEv = upcoming(1)[0];
+  const photoCount = all('photo').length;
+  const recipes = entries.filter((e) => e.data.category === 'recipe');
+  const bestRecipe = recipes.filter((e) => avgRating(e) != null).sort((x, y) => avgRating(y) - avgRating(x))[0];
+  const pendingRsvp = expandEvents(todayStr, isoDate(new Date(Date.now() + 365 * 86400000))).filter((o) => !o.ev.data.rsvp?.[me()] && o.ev.createdBy !== me()).length;
 
   el.innerHTML = String(html`
     <div class="page">
@@ -134,8 +141,24 @@ export function render(el) {
           <button class="x" data-act="dismiss-install" aria-label="Ausblenden">${icon('close')}</button>
         </div>` : ''}
 
+      ${nextEv ? (() => {
+        const c = eventCat(nextEv.ev.data.category);
+        const d = parseDate(nextEv.occ);
+        return html`
+        <a class="next-event card-link" href="#/event/${nextEv.ev.id}?d=${nextEv.occ}">
+          <div class="datebox"><div class="mo" style="background:${c.color}">${d.toLocaleDateString('de-DE', { month: 'short' }).replace('.', '')}</div><div class="d">${d.getDate()}</div></div>
+          <div class="grow">
+            <div class="lbl">Als Nächstes · ${countdownText(nextEv.ev, nextEv.occ)}</div>
+            <div class="t ellipsis">${c.emoji} ${nextEv.ev.data.title}</div>
+            <div class="m ellipsis">${fmtWhen(nextEv.ev, nextEv.occ, { long: false }).split(' · ').slice(-1)[0]}${nextEv.ev.data.place ? ` · ${shortPlace(nextEv.ev.data.place)}` : ''}</div>
+          </div>
+          <span class="chev faint">${icon('chevron')}</span>
+        </a>`;
+      })() : ''}
+      ${pendingRsvp ? html`<a class="card card-link" href="#/calendar" style="display:flex;align-items:center;gap:12px;margin-top:10px;padding:12px 14px"><span style="font-size:22px">📅</span><span class="grow" style="font-size:15px">${pendingRsvp === 1 ? `${nameOf(me() === 'a' ? 'b' : 'a')} hat einen Termin geplant – deine Zusage fehlt` : `${pendingRsvp} Termine warten auf deine Zusage`}</span><span class="badge">${pendingRsvp}</span></a>` : ''}
+
       ${start ? html`
-        <div class="card counter-card glow">
+        <div class="card counter-card">
           <span class="beat">${icon('heartFill')}</span>
           <div class="big">${fmtNumber(days)}</div>
           <div class="lbl">${isAnniversary ? html`<strong class="rose">Alles Gute zum ${parts.y}. Jahrestag! 🥂</strong>` : 'Tage voller Liebe'}</div>
@@ -147,7 +170,7 @@ export function render(el) {
         </div>` : ''}
 
       ${unread ? html`
-        <a class="card card-link glow section" href="#/letters" style="display:flex;align-items:center;gap:14px;margin-top:16px">
+        <a class="card card-link section" href="#/letters" style="display:flex;align-items:center;gap:14px;margin-top:16px">
           <span style="font-size:34px">💌</span>
           <div class="grow"><div style="font-weight:600">${unread === 1 ? 'Ein Liebesbrief wartet auf dich' : `${unread} Liebesbriefe warten auf dich`}</div><div class="muted" style="font-size:14px">von ${nameOf(me() === 'a' ? 'b' : 'a')}</div></div>
           <span class="badge">${unread}</span>
@@ -190,6 +213,14 @@ export function render(el) {
       </div>
 
       <div class="section">
+        <a class="tile card-link" href="#/entries?cat=recipe" style="flex-direction:row;align-items:center;min-height:0;margin-bottom:12px">
+          <span class="tile-emoji" style="font-size:30px">👩‍🍳</span>
+          <div class="grow">
+            <div class="tile-title">Unsere Rezepte</div>
+            <div class="tile-sub ellipsis">${recipes.length ? `${recipes.length} ausprobiert${bestRecipe ? ` · Favorit: ${bestRecipe.data.title}` : ''}` : 'Was wir zusammen gekocht haben – mit Fotos & Herzen'}</div>
+          </div>
+          <span class="faint">${icon('chevron')}</span>
+        </a>
         <div class="card-grid">
           <a class="tile card-link" href="#/bucket">
             <span class="tile-emoji">🌠</span>
@@ -204,9 +235,9 @@ export function render(el) {
             <span class="tile-emoji">📊</span>
             <div><div class="tile-title">Statistik</div><div class="tile-sub">Wer bewertet strenger?</div></div>
           </a>
-          <a class="tile card-link" href="#/timeline">
-            <span class="tile-emoji">💞</span>
-            <div><div class="tile-title">Unsere Timeline</div><div class="tile-sub">Von Anfang an</div></div>
+          <a class="tile card-link" href="#/gallery">
+            <span class="tile-emoji">🖼️</span>
+            <div><div class="tile-title">Galerie</div><div class="tile-sub">${photoCount ? `${photoCount} ${photoCount === 1 ? 'Foto' : 'Fotos'}` : 'Eure Fotos'}</div></div>
           </a>
         </div>
       </div>

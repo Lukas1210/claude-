@@ -11,6 +11,7 @@ import { placeLabel, flag } from '../geo.js';
 import { getStatus, onStatus, isConfigured, currentUser, login, logout, syncNow, setCredentials, config } from '../sync.js';
 import { getBlob } from '../photos.js';
 import { afterPaint, refresh } from '../router.js';
+import { getThemePref, setThemePref } from '../theme.js';
 
 export const live = true;
 
@@ -213,6 +214,14 @@ export async function render(el) {
         </div>
 
         <div>
+          <div class="group-label">Darstellung</div>
+          <div class="seg">
+            ${[['system', 'Automatisch'], ['light', 'Hell'], ['dark', 'Dunkel']].map(([k, l]) => html`<button class="${getThemePref() === k ? 'active' : ''}" data-theme-pref="${k}">${l}</button>`)}
+          </div>
+          <div class="group-foot">„Automatisch“ folgt der Einstellung deines iPhones (hell am Tag, dunkel am Abend).</div>
+        </div>
+
+        <div>
           <div class="group-label">Synchronisation</div>
           ${syncHtml}
         </div>
@@ -231,7 +240,7 @@ export async function render(el) {
           <div class="group">
             ${!standalone ? html`<button class="cell link" data-act="install" style="width:100%;text-align:left"><span class="cell-icon">${icon('share')}</span><span class="grow">Zum Home-Bildschirm hinzufügen</span><span class="chev">${icon('chevron')}</span></button>` : ''}
             <div class="cell"><span class="cell-icon">${icon('heart')}</span><span class="grow">Couple Journal</span><span class="value">Version ${APP_VERSION}</span></div>
-            <button class="cell link" data-act="reset" style="width:100%;text-align:left"><span class="cell-icon" style="background:rgba(255,107,107,.12);color:var(--danger)">${icon('trash')}</span><span class="grow" style="color:var(--danger)">Daten auf diesem iPhone löschen</span></button>
+            <button class="cell link" data-act="reset" style="width:100%;text-align:left"><span class="cell-icon danger">${icon('trash')}</span><span class="grow" style="color:var(--danger)">Daten auf diesem iPhone löschen</span></button>
           </div>
         </div>
         <p class="center faint" style="font-size:12.5px">Mit ♡ gemacht für ${nameOf('a')} &amp; ${nameOf('b')}</p>
@@ -272,8 +281,13 @@ export async function render(el) {
     }
   };
   const onClick = async (e) => {
-    const t = e.target.closest('[data-act], [data-me], [data-anniv]');
+    const t = e.target.closest('[data-act], [data-me], [data-anniv], [data-theme-pref]');
     if (!t) return;
+    if (t.dataset.themePref) {
+      setThemePref(t.dataset.themePref);
+      el.querySelectorAll('[data-theme-pref]').forEach((b) => b.classList.toggle('active', b === t));
+      return;
+    }
     if (t.dataset.me) { await setDevice({ me: t.dataset.me }); refresh(); return; }
     if (t.dataset.anniv) { anniversarySheet((settings().anniversaries || []).find((a) => a.id === t.dataset.anniv)); return; }
     switch (t.dataset.act) {

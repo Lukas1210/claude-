@@ -17,9 +17,10 @@ const TITLE_HINT = {
   food: 'Restaurant oder Gericht',
   trip: 'Wohin ging die Reise?',
   gift: 'Was war das Geschenk?',
+  recipe: 'Welches Gericht habt ihr gekocht?',
 };
 
-export function openEntryForm({ category = 'date', id = null, prefill = {}, wishId = null } = {}) {
+export function openEntryForm({ category = 'date', id = null, prefill = {}, wishId = null, onSaved = null } = {}) {
   const existing = id ? get(id) : null;
   const d = existing ? structuredClone(existing.data) : {};
   const st = {
@@ -37,6 +38,8 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
     coverId: d.coverId || null,
   };
   if (st.category === 'gift' && !st.extra.from) st.extra.from = me();
+  if (!existing && st.category === 'recipe' && prefill.notes && !st.extra.tips) st.extra.tips = prefill.notes;
+  if (!existing && st.category === 'recipe' && !st.extra.cook) st.extra.cook = 'both';
   const removedPhotos = [];
   let pending = [];
   let dateTouched = !!existing;
@@ -66,7 +69,11 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
       case 'text':
         return html`<div class="cell"><label>${f.label}</label><input data-xi="${f.key}" placeholder="${f.placeholder || ''}" value="${v || ''}"></div>`;
       case 'textarea':
-        return html`<div class="cell col"><label>${f.label}</label><textarea data-xi="${f.key}" rows="3" placeholder="${f.placeholder || ''}">${v || ''}</textarea></div>`;
+        return html`<div class="cell col"><textarea data-xi="${f.key}" rows="${f.rows || 3}" placeholder="${f.placeholder || ''}">${v || ''}</textarea></div>`;
+      case 'number':
+        return html`<div class="cell"><label>${f.label}</label><input data-xi="${f.key}" inputmode="numeric" pattern="[0-9]*" placeholder="${f.placeholder || ''}" value="${v ?? ''}" style="text-align:right"><span class="muted">${f.unit || ''}</span></div>`;
+      case 'who':
+        return html`<div class="cell col"><label>${f.label}</label><div class="opt-row">${opt('a', nameOf('a'))}${opt('b', nameOf('b'))}${opt('both', '👫 Zusammen')}</div></div>`;
       case 'money':
         return html`<div class="cell"><label>${f.label}</label><input data-xi="${f.key}" inputmode="decimal" placeholder="0" value="${v ?? ''}" style="text-align:right"><span class="muted">€</span></div>`;
       case 'select':
@@ -98,6 +105,7 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
 
   function renderPlace() {
     const cell = body.querySelector('#place-cell');
+    if (!cell) return;
     cell.innerHTML = String(st.place
       ? html`<span class="cell-icon">${st.place.countryCode ? flag(st.place.countryCode) : icon('pin')}</span><span class="grow"><span>${st.place.name}</span>${st.place.label ? html`<small class="faint" style="display:block;font-size:13px">${st.place.label}</small>` : ''}</span><span class="chev">${icon('chevron')}</span>`
       : html`<span class="cell-icon">${icon('pin')}</span><span class="grow muted">Ort hinzufügen</span><span class="chev">${icon('chevron')}</span>`);
@@ -107,7 +115,7 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
     const r = st.ratings[slot] || {};
     return html`
       <div class="cell col">
-        <label style="font-family:var(--font-serif);font-style:italic;font-size:16px;color:var(--text)">${nameOf(slot)}${slot === me() ? ' (du)' : ''}</label>
+        <label style="font-weight:600;font-size:15px;color:var(--text)">${nameOf(slot)}${slot === me() ? ' (du)' : ''}</label>
         <div data-hearts="${slot}"></div>
         <input data-comment="${slot}" placeholder="Kommentar (optional)" value="${r.comment || ''}" style="font-size:15px">
       </div>`;
@@ -115,6 +123,9 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
 
   function render() {
     const cat = CATEGORIES[st.category];
+    const fields = EXTRA_FIELDS[st.category] || [];
+    const shortFields = fields.filter((f) => f.type !== 'textarea');
+    const longFields = fields.filter((f) => f.type === 'textarea');
     body.innerHTML = String(html`
       <div class="form">
         ${!existing ? html`<div class="chips" style="margin-top:-4px">${Object.values(CATEGORIES).map((c) => html`<button type="button" class="chip ${st.category === c.key ? 'active' : ''}" data-cat="${c.key}">${c.emoji} ${c.label}</button>`)}</div>` : ''}
@@ -128,9 +139,9 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
 
         <div>
           <div class="group">
-            <div class="cell"><label>${st.category === 'trip' ? 'Von' : 'Datum'}</label><input type="date" id="date" value="${st.date}"></div>
+            <div class="cell"><label>${st.category === 'trip' ? 'Von' : st.category === 'recipe' ? 'Gekocht am' : 'Datum'}</label><input type="date" id="date" value="${st.date}"></div>
             ${st.category === 'trip' ? html`<div class="cell"><label>Bis</label><input type="date" id="endDate" value="${st.endDate}" min="${st.date}"></div>` : ''}
-            <button type="button" class="cell link" id="place-cell" data-act="place" style="width:100%;text-align:left"></button>
+            ${st.category !== 'recipe' ? html`<button type="button" class="cell link" id="place-cell" data-act="place" style="width:100%;text-align:left"></button>` : ''}
           </div>
         </div>
 
@@ -140,19 +151,27 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
           <div class="group-foot">Tippe oder wische über die Herzen – die linke Hälfte gibt ein halbes Herz.</div>
         </div>
 
-        ${EXTRA_FIELDS[st.category]?.length ? html`
+        ${shortFields.length ? html`
           <div>
             <div class="group-label">${cat.label}</div>
-            <div class="group">${EXTRA_FIELDS[st.category].map(extraField)}</div>
+            <div class="group">${shortFields.map(extraField)}</div>
           </div>` : ''}
 
+        ${longFields.map((f) => html`
+          <div>
+            <div class="group-label">${f.label}</div>
+            <div class="group">${extraField(f)}</div>
+            ${f.key === 'ingredients' ? html`<div class="group-foot">Mengen am Zeilenanfang (z. B. „200 g“, „1/2 TL“) rechnet die App später auf andere Portionen um.</div>` : ''}
+          </div>`)}
+
+        ${st.category !== 'recipe' ? html`
         <div>
           <div class="group-label">Notizen</div>
           <div class="group"><div class="cell col"><textarea id="notes" rows="4" placeholder="Was wir nicht vergessen wollen …">${st.notes}</textarea></div></div>
-        </div>
+        </div>` : ''}
 
         <div class="group">
-          <div class="cell"><span class="cell-icon" style="background:var(--champ-soft);color:var(--champ)">${icon('starFill')}</span><label>Lieblingsmoment</label><span class="toggle"><input type="checkbox" id="fav" ${st.favorite ? 'checked' : ''}><span></span></span></div>
+          <div class="cell"><span class="cell-icon amber">${icon('starFill')}</span><label>${st.category === 'recipe' ? 'Lieblingsrezept' : 'Lieblingsmoment'}</label><span class="toggle"><input type="checkbox" id="fav" ${st.favorite ? 'checked' : ''}><span></span></span></div>
         </div>
 
         ${existing ? html`<button type="button" class="btn danger block" data-act="delete">${icon('trash')} Erinnerung löschen</button>` : ''}
@@ -160,6 +179,7 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
       </div>`);
     renderPhotos();
     renderPlace();
+    requestAnimationFrame(() => body.querySelectorAll('textarea').forEach(autosize));
     body.querySelectorAll('[data-hearts]').forEach((h) => {
       const slot = h.dataset.hearts;
       mountHeartInput(h, {
@@ -174,7 +194,7 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
     st.title = q('#title').value.trim();
     st.date = q('#date').value || st.date;
     if (q('#endDate')) st.endDate = q('#endDate').value;
-    st.notes = q('#notes').value.trim();
+    if (q('#notes')) st.notes = q('#notes').value.trim();
     st.favorite = q('#fav').checked;
     body.querySelectorAll('[data-comment]').forEach((i) => {
       const slot = i.dataset.comment;
@@ -238,7 +258,7 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
         title: st.title,
         date: st.date,
         endDate: st.category === 'trip' ? st.endDate || null : null,
-        place: st.place,
+        place: st.category === 'recipe' ? null : st.place,
         ratings: st.ratings,
         notes: st.notes,
         favorite: st.favorite,
@@ -254,6 +274,7 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
         if (p && p.data.entryId !== st.id) await update(pid, { entryId: st.id });
       }
       if (wishId && get(wishId)) await update(wishId, { done: true, doneAt: today(), entryId: st.id });
+      if (onSaved) await onSaved(st.id);
       saved = true;
       const r = btn.getBoundingClientRect();
       heartBurst(r.left + r.width / 2, r.top + r.height / 2, 14);
@@ -320,7 +341,9 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
       }
     }
   });
+  const autosize = (ta) => { ta.style.height = 'auto'; ta.style.height = `${Math.min(ta.scrollHeight + 2, 520)}px`; };
   body.addEventListener('input', (e) => {
+    if (e.target.matches('textarea')) autosize(e.target);
     dirty = true;
     if (e.target.id === 'date') dateTouched = true;
   });

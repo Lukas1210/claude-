@@ -5,7 +5,7 @@ import { all, get, save, update, remove, uuid, nameOf } from '../store.js';
 import { WISH_CATEGORIES, CATEGORIES, fmtDate, today } from '../model.js';
 import { topbar, emptyState } from '../ui/components.js';
 import { openSheet, actionSheet, confirmDialog, toast } from '../ui/sheet.js';
-import { heartBurst, heartRain } from '../ui/fx.js';
+import { heartBurst } from '../ui/fx.js';
 import { afterPaint } from '../router.js';
 
 const state = { tab: 'open' };
@@ -94,7 +94,6 @@ export function render(el) {
 async function surprise() {
   const open = all('wish').filter((w) => !w.data.done);
   if (!open.length) return;
-  heartRain(14);
   let w = open[Math.floor(Math.random() * open.length)];
   const sheet = openSheet({
     title: 'Wie wär\'s mit …',

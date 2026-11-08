@@ -181,7 +181,17 @@ check('1234 Wünsche vollständig übertragen', nB === 1234, `${nB}`);
 const dirtyLeft = await A.run(async () => (await import('./js/store.js')).dirtyItems().length);
 check('Keine offenen Änderungen nach Sync', dirtyLeft === 0, `${dirtyLeft}`);
 
-// 7) Zweiter Sync ohne Änderungen überträgt nichts
+// 7) Termin: A plant, B sagt zu, A sieht die Zusage
+const evId = await A.run(async () => (await (await import('./js/store.js')).save('event', { title: 'Kino', category: 'date', date: '2026-12-01', time: '20:00', endDate: '2026-12-01', endTime: '22:30', allDay: false, repeat: 'weekly', rsvp: { a: 'yes' }, entries: {} })).id);
+await A.sync();
+r = await B.sync();
+check('B erhält Termin', r.fromPartner === 1 && (await B.run(async (id) => (await import('./js/store.js')).get(id)?.data.title, evId)) === 'Kino');
+await B.run(async (id) => { const S = await import('./js/store.js'); const e = S.get(id); await S.update(id, { rsvp: { ...e.data.rsvp, b: 'yes' } }); }, evId);
+await B.sync();
+await A.sync();
+check('A sieht Zusage von B', (await A.run(async (id) => (await import('./js/store.js')).get(id).data.rsvp.b, evId)) === 'yes');
+
+// 8) Zweiter Sync ohne Änderungen überträgt nichts
 r = await B.sync();
 check('Leerlauf-Sync überträgt nichts', r.pushed === 0 && r.fromPartner === 0, JSON.stringify(r));
 

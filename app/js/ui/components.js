@@ -104,7 +104,10 @@ export function entryCard(entry) {
   const avg = avgRating(entry);
   const meta = [d.category === 'trip' ? fmtRange(d.date, d.endDate) : fmtDate(d.date)];
   if (d.category === 'gift') { const g = giftLine(entry); if (g) meta.push(g); }
-  else if (d.place) meta.push(shortPlace(d.place));
+  else if (d.category === 'recipe') {
+    if (d.extra?.course) meta.push(d.extra.course.replace(/^\S+\s/, ''));
+    if (d.extra?.time) meta.push(`${d.extra.time} Min.`);
+  } else if (d.place) meta.push(shortPlace(d.place));
   return html`
     <a class="entry-card card-link" href="#/entry/${entry.id}">
       <div class="entry-thumb">${thumb(entry)}</div>
