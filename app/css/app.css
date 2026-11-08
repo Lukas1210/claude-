@@ -506,6 +506,13 @@ svg.i { width: 1.15em; height: 1.15em; vertical-align: -0.2em; flex: none; }
 }
 .cell input[type=date], .cell input[type=time] { text-align: right; color: var(--accent); min-height: 30px; }
 .cell input[type=date]::-webkit-date-and-time-value, .cell input[type=time]::-webkit-date-and-time-value { text-align: right; }
+.cell input[type=date], .cell input[type=time] { display: block; line-height: 30px; }
+/* iOS: leeres Datumsfeld hat sonst die Höhe 0 und lässt sich nicht antippen */
+input[type=date]::-webkit-date-and-time-value, input[type=time]::-webkit-date-and-time-value { min-height: 1.3em; }
+/* Platzhalter für leere Datumsfelder (nur iOS, dort ist ein leeres Feld sonst leer) */
+@supports (-webkit-touch-callout: none) {
+  .cell input[type=date][value=""]:not(.filled)::before { content: attr(placeholder); color: var(--text3); }
+}
 .cell input.pill { flex: none; width: auto; background: var(--fill); border-radius: 7px; padding: 5px 8px; color: var(--text); text-align: center; }
 .cell input.pill[type=date] { width: 138px; }
 .cell input.pill[type=time] { width: 80px; }

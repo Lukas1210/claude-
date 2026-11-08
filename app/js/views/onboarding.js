@@ -58,7 +58,7 @@ export function runOnboarding() {
           <p class="lead">Ab diesem Tag beginnt eure Timeline – und der Zähler, wie lange ihr schon ein Paar seid.</p>
           <div class="form" style="margin-top:26px">
             <div class="group">
-              <div class="cell"><label>Unser Tag</label><input id="sd" type="date" max="${today()}" value="${data.startDate}"></div>
+              <div class="cell"><label>Unser Tag</label><input id="sd" type="date" max="${today()}" placeholder="Datum wählen" value="${data.startDate}"></div>
             </div>
           </div>
           <div class="actions">

@@ -146,7 +146,7 @@ function anniversarySheet(existing) {
         <div class="group">
           <div class="cell"><label>Emoji</label><input id="ae" value="${existing?.emoji || '💍'}" maxlength="4" style="font-size:22px;text-align:right"></div>
           <div class="cell"><label>Name</label><input id="at" placeholder="z. B. Erster Kuss" value="${existing?.title || ''}"></div>
-          <div class="cell"><label>Datum</label><input id="ad" type="date" value="${existing?.date || ''}"></div>
+          <div class="cell"><label>Datum</label><input id="ad" type="date" placeholder="Datum wählen" value="${existing?.date || ''}"></div>
         </div>
         ${existing ? html`<button class="btn danger block" data-act="delete">${icon('trash')} Löschen</button>` : ''}
       </div>`,
@@ -183,9 +183,9 @@ export async function render(el) {
           <div class="group">
             <div class="cell"><label>Name 1</label><input data-s="name-a" value="${s.names.a}" placeholder="Name"></div>
             <div class="cell"><label>Name 2</label><input data-s="name-b" value="${s.names.b}" placeholder="Name"></div>
-            <div class="cell"><label>Zusammen seit</label><input type="date" data-s="startDate" value="${s.startDate || ''}"></div>
-            <div class="cell"><label>🎂 ${nameOf('a')}</label><input type="date" data-s="bday-a" value="${s.birthdays.a || ''}"></div>
-            <div class="cell"><label>🎂 ${nameOf('b')}</label><input type="date" data-s="bday-b" value="${s.birthdays.b || ''}"></div>
+            <div class="cell"><label>Zusammen seit</label><input type="date" placeholder="Datum wählen" data-s="startDate" value="${s.startDate || ''}"></div>
+            <div class="cell"><label>🎂 ${nameOf('a')}</label><input type="date" placeholder="Datum wählen" data-s="bday-a" value="${s.birthdays.a || ''}"></div>
+            <div class="cell"><label>🎂 ${nameOf('b')}</label><input type="date" placeholder="Datum wählen" data-s="bday-b" value="${s.birthdays.b || ''}"></div>
             <button class="cell link" data-act="home" style="width:100%;text-align:left">
               <label>Zuhause</label>
               <span class="value grow ellipsis">${s.home ? html`${flag(s.home.countryCode)} ${placeLabel(s.home)}` : 'Festlegen'}</span>

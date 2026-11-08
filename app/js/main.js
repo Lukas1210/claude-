@@ -154,6 +154,17 @@ async function boot() {
     return;
   }
   applyTheme();
+  // Datumsfelder: Platzhalter ausblenden, sobald etwas gewählt ist; Tippen auf die Zeile öffnet die Auswahl
+  const markDate = (e) => { const t = e.target; if (t.matches?.('input[type=date], input[type=time]')) t.classList.toggle('filled', !!t.value); };
+  document.addEventListener('input', markDate, true);
+  document.addEventListener('change', markDate, true);
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('input, select, textarea, button, a')) return;
+    const inp = e.target.closest('.cell')?.querySelector('input[type=date]:not(:disabled), input[type=time]:not(:disabled)');
+    if (!inp || inp.closest('.cell').querySelectorAll('input').length > 1) return;
+    inp.focus();
+    try { inp.showPicker?.(); } catch {}
+  });
   buildShell();
   registerSW();
   const splash = document.getElementById('splash');
