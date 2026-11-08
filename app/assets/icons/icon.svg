@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="36%" r="78%">
+      <stop offset="0" stop-color="#3b2f6e"/>
+      <stop offset=".55" stop-color="#1d1b3a"/>
+      <stop offset="1" stop-color="#0e0e22"/>
+    </radialGradient>
+    <linearGradient id="rose" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffc0cc"/>
+      <stop offset=".5" stop-color="#ff7d98"/>
+      <stop offset="1" stop-color="#d9476f"/>
+    </linearGradient>
+    <linearGradient id="champ" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff1da"/>
+      <stop offset="1" stop-color="#e4bd86"/>
+    </linearGradient>
+    <filter id="glow" filterUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><feGaussianBlur stdDeviation="18"/></filter>
+    <filter id="soft" filterUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><feGaussianBlur stdDeviation="2"/></filter>
+    <path id="heart" d="M12 21.2c-.2 0-.4-.1-.6-.2C10.9 20.7 3 15.8 1.1 10.8.4 8.9.6 6.9 1.7 5.4 2.8 3.9 4.6 3 6.6 3c2.2 0 4 1 5.4 2.6C13.4 4 15.2 3 17.4 3c2 0 3.8.9 4.9 2.4 1.1 1.5 1.3 3.5.6 5.4-1.9 5-9.8 9.9-10.3 10.2-.2.1-.4.2-.6.2z"/>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <g fill="#fff">
+    <circle cx="78" cy="92" r="2.6" opacity=".8"/>
+    <circle cx="420" cy="70" r="3.2" opacity=".9"/>
+    <circle cx="452" cy="182" r="2" opacity=".6"/>
+    <circle cx="58" cy="236" r="1.8" opacity=".5"/>
+    <circle cx="132" cy="44" r="1.6" opacity=".6"/>
+    <circle cx="348" cy="40" r="1.8" opacity=".5"/>
+    <circle cx="468" cy="420" r="2.2" opacity=".5"/>
+    <circle cx="44" cy="430" r="2.4" opacity=".6"/>
+    <circle cx="96" cy="470" r="1.6" opacity=".45"/>
+    <circle cx="400" cy="474" r="1.8" opacity=".5"/>
+  </g>
+  <path d="M412 112l5 13 13 5-13 5-5 13-5-13-13-5 13-5z" fill="#f3d9b1" opacity=".95"/>
+  <path d="M98 150l3.5 9 9 3.5-9 3.5-3.5 9-3.5-9-9-3.5 9-3.5z" fill="#ffc0cc" opacity=".85"/>
+  <!-- Glow -->
+  <g filter="url(#glow)" opacity=".55"><use href="#heart" transform="translate(106 118) scale(11.2)" fill="#ff6b8b"/></g>
+  <!-- Rosé-Herz -->
+  <use href="#heart" transform="translate(96 124) scale(11.2)" fill="url(#rose)"/>
+  <!-- Champagner-Herz (verschlungen) -->
+  <use href="#heart" transform="translate(212 196) scale(8.6)" fill="none" stroke="url(#champ)" stroke-width="1.55" stroke-linejoin="round"/>
+  <!-- Glanzlicht -->
+  <path d="M150 190c-22 6-36 26-34 50" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="10" stroke-linecap="round" filter="url(#soft)"/>
+</svg>
