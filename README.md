@@ -1,6 +1,6 @@
 # Couple Journal 💞
 
-Euer gemeinsames Tagebuch fürs iPhone: Dates, Aktivitäten, Essen, Reisen und Geschenke festhalten und **jeder für sich mit Herzen bewerten**. Dazu gibt es einen **Kalender** zum Planen eurer Treffen, Fotos, einen **Globus** mit allen Orten, an denen ihr wart, eine **Timeline** ab eurem ersten Tag und eine **Galerie**. Die App liegt wie eine echte App auf dem Home-Bildschirm – in **hell oder dunkel**, passend zum iPhone.
+Euer gemeinsames Tagebuch fürs iPhone: Dates, Aktivitäten, Essen, selbst gekochte Rezepte, Reisen und Geschenke festhalten und **jeder für sich mit Herzen bewerten**. Dazu gibt es einen **Kalender** zum Planen eurer Treffen, Fotos, einen **Globus** mit allen Orten, an denen ihr wart, eine **Timeline** ab eurem ersten Tag und eine **Galerie**. Die App liegt wie eine echte App auf dem Home-Bildschirm – in **hell oder dunkel**, passend zum iPhone.
 
 ![Couple Journal – Startseite, Kalender, Termin und Globus in hell und dunkel](docs/screenshots.jpg)
 
@@ -10,6 +10,7 @@ Euer gemeinsames Tagebuch fürs iPhone: Dates, Aktivitäten, Essen, Reisen und G
 |---|---|
 | 📅 **Kalender** | Treffen planen mit Datum, Uhrzeit (von–bis) oder ganztägig, Ort, Notizen und Kategorie. Monats- und Listenansicht, Geburtstage und Jahrestage stehen automatisch drin. Termine lassen sich **wiederholen** (täglich, wöchentlich, alle 2 Wochen, monatlich, jährlich), jeder kann **zusagen, absagen oder „vielleicht“** sagen, und mit einem Tipp landet ein Termin samt **Erinnerung im iPhone-Kalender**. Nach dem Treffen wird daraus mit einem Tipp ein bewertbares Erlebnis. |
 | 🌹 **Erlebnisse bewerten** | Dates, Aktivitäten, Essen, Reisen und Geschenke. Jeder von euch vergibt 1–5 Herzen (auch halbe) und einen Kommentar. Der Durchschnitt wird automatisch berechnet. |
+| 👩‍🍳 **Rezepte** | Was ihr zusammen gekocht oder gebacken habt, mit Fotos und Herzen von euch beiden. Dazu Gang, Zeit, Portionen, Aufwand, wer gekocht hat, Zutaten, Zubereitung, eure Tipps und die Quelle (z. B. ein Link). Beim Nachkochen könnt ihr Zutaten und Schritte abhaken und **auf andere Portionen umrechnen**; der **Kochmodus** hält den Bildschirm an. Die Suche findet Rezepte auch über Zutaten, und Rezept-Wünsche landen auf der Bucket-Liste. |
 | 🍝 **Passende Felder je Kategorie** | Beim Essen: Küche, Lieblingsgericht, Preis und „Wieder hin?“. Beim Geschenk: von wem an wen und der Anlass. Bei der Reise: Zeitraum, Anreise und Highlights. |
 | 📸 **Fotos** | Mehrere Fotos pro Erinnerung, eins davon als Titelbild. Aufnahmedatum und Ort werden automatisch aus dem Foto übernommen. Die Fotos werden verkleinert, damit sie wenig Speicher brauchen. |
 | 🌍 **Globus** | Zum Drehen und Zoomen. Besuchte Länder leuchten rosé, Herzen markieren eure Orte, und Bögen führen von eurem Zuhause zu jeder Reise. Dazu kommt eine Statistik mit Ländern, Orten und Kilometern. |
@@ -98,6 +99,7 @@ app/
   js/main.js                Start, Tab-Leiste, „+“-Menü, Service Worker
   js/theme.js               Hell/Dunkel/Automatisch
   js/events.js              Termine: Wiederholungen, besondere Tage, iPhone-Kalender (.ics)
+  js/recipe.js              Rezepte: Zutaten umrechnen, Schritte, Kochmodus
   js/store.js, db.js        Daten (IndexedDB, offline first)
   js/sync.js                Supabase-Sync (Push/Pull, Fotos, Realtime)
   js/photos.js, exif.js     Fotos komprimieren, EXIF lesen, lazy laden

@@ -21,6 +21,7 @@ const CORE = [
   'js/main.js',
   'js/model.js',
   'js/photos.js',
+  'js/recipe.js',
   'js/router.js',
   'js/store.js',
   'js/sync.js',

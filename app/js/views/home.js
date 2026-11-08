@@ -117,6 +117,8 @@ export function render(el) {
   const cds = countdowns().slice(0, 6);
   const nextEv = upcoming(1)[0];
   const photoCount = all('photo').length;
+  const recipes = entries.filter((e) => e.data.category === 'recipe');
+  const bestRecipe = recipes.filter((e) => avgRating(e) != null).sort((x, y) => avgRating(y) - avgRating(x))[0];
   const pendingRsvp = expandEvents(todayStr, isoDate(new Date(Date.now() + 365 * 86400000))).filter((o) => !o.ev.data.rsvp?.[me()] && o.ev.createdBy !== me()).length;
 
   el.innerHTML = String(html`
@@ -211,6 +213,14 @@ export function render(el) {
       </div>
 
       <div class="section">
+        <a class="tile card-link" href="#/entries?cat=recipe" style="flex-direction:row;align-items:center;min-height:0;margin-bottom:12px">
+          <span class="tile-emoji" style="font-size:30px">👩‍🍳</span>
+          <div class="grow">
+            <div class="tile-title">Unsere Rezepte</div>
+            <div class="tile-sub ellipsis">${recipes.length ? `${recipes.length} ausprobiert${bestRecipe ? ` · Favorit: ${bestRecipe.data.title}` : ''}` : 'Was wir zusammen gekocht haben – mit Fotos & Herzen'}</div>
+          </div>
+          <span class="faint">${icon('chevron')}</span>
+        </a>
         <div class="card-grid">
           <a class="tile card-link" href="#/bucket">
             <span class="tile-emoji">🌠</span>

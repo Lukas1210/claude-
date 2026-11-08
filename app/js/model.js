@@ -6,7 +6,8 @@ export const APP_VERSION = '1.0.0';
 export const CATEGORIES = {
   date: { key: 'date', label: 'Date', plural: 'Dates', emoji: '🌹', hint: 'Ein besonderer Abend zu zweit' },
   activity: { key: 'activity', label: 'Aktivität', plural: 'Aktivitäten', emoji: '🎡', hint: 'Ausflüge, Konzerte, Sport …' },
-  food: { key: 'food', label: 'Essen', plural: 'Essen', emoji: '🍝', hint: 'Restaurants, Cafés, Gekochtes' },
+  food: { key: 'food', label: 'Essen', plural: 'Essen', emoji: '🍝', hint: 'Restaurants, Cafés & Lieferdienste' },
+  recipe: { key: 'recipe', label: 'Rezept', plural: 'Rezepte', emoji: '👩‍🍳', hint: 'Was wir selbst gekocht und gebacken haben' },
   trip: { key: 'trip', label: 'Reise', plural: 'Reisen', emoji: '✈️', hint: 'Urlaube & Wochenendtrips' },
   gift: { key: 'gift', label: 'Geschenk', plural: 'Geschenke', emoji: '🎁', hint: 'Was wir uns geschenkt haben' },
 };
@@ -15,7 +16,9 @@ export const CATEGORY_KEYS = Object.keys(CATEGORIES);
 const MOODS = ['😍 Verliebt', '🌙 Romantisch', '🥰 Gemütlich', '😂 Lustig', '🤩 Aufregend', '😌 Entspannt', '🥳 Ausgelassen'];
 const OCCASIONS = ['🎂 Geburtstag', '💞 Jahrestag', '🎄 Weihnachten', '💘 Valentinstag', '🌷 Einfach so', '🎓 Erfolg', '✨ Sonstiges'];
 const TRANSPORT = ['✈️ Flug', '🚆 Zug', '🚗 Auto', '🚌 Bus', '⛴️ Fähre', '🚲 Fahrrad', '🚶 Zu Fuß'];
-const MEALS = ['🥐 Frühstück', '🥗 Mittag', '🍷 Abendessen', '🍰 Café & Kuchen', '🍸 Drinks', '🏠 Selbst gekocht', '🛵 Bestellt'];
+const MEALS = ['🥐 Frühstück', '🥗 Mittag', '🍷 Abendessen', '🍰 Café & Kuchen', '🍸 Drinks', '🛵 Bestellt'];
+const COURSES = ['🥐 Frühstück', '🥗 Vorspeise', '🍝 Hauptgericht', '🥦 Beilage', '🍰 Dessert', '🧁 Gebacken', '🍿 Snack', '🍹 Getränk'];
+const DIFFICULTY = ['🙂 Einfach', '👌 Mittel', '🧑‍🍳 Anspruchsvoll'];
 
 /** Kategorie-spezifische Felder. type: text | textarea | select | price | money | yesno | partner | toggle */
 export const EXTRA_FIELDS = {
@@ -34,6 +37,19 @@ export const EXTRA_FIELDS = {
     { key: 'price', label: 'Preis', type: 'price' },
     { key: 'again', label: 'Wieder hin?', type: 'yesno' },
   ],
+  recipe: [
+    { key: 'cook', label: 'Gekocht von', type: 'who' },
+    { key: 'course', label: 'Gang', type: 'select', options: COURSES },
+    { key: 'time', label: 'Zeit', type: 'number', unit: 'Min.', placeholder: '30' },
+    { key: 'servings', label: 'Portionen', type: 'number', unit: 'Port.', placeholder: '2' },
+    { key: 'difficulty', label: 'Aufwand', type: 'select', options: DIFFICULTY },
+    { key: 'cuisine', label: 'Küche', type: 'text', placeholder: 'z. B. Italienisch, Vegetarisch' },
+    { key: 'ingredients', label: 'Zutaten', type: 'textarea', rows: 6, placeholder: 'Eine Zutat pro Zeile, z. B.\n200 g Spaghetti\n2 Knoblauchzehen\n1/2 TL Chiliflocken' },
+    { key: 'steps', label: 'Zubereitung', type: 'textarea', rows: 6, placeholder: 'Ein Schritt pro Zeile, z. B.\nNudeln in Salzwasser kochen\nKnoblauch in Öl anbraten …' },
+    { key: 'tips', label: 'Unsere Tipps & Änderungen', type: 'textarea', rows: 3, placeholder: 'Was würden wir beim nächsten Mal anders machen?' },
+    { key: 'source', label: 'Quelle', type: 'text', placeholder: 'Link, Kochbuch oder Oma 😉' },
+    { key: 'again', label: 'Nochmal kochen?', type: 'yesno' },
+  ],
   trip: [
     { key: 'transport', label: 'Anreise', type: 'select', options: TRANSPORT },
     { key: 'highlights', label: 'Highlights', type: 'textarea', placeholder: 'Was war am schönsten?' },
@@ -51,6 +67,7 @@ export const MILESTONE_EMOJIS = ['💞', '💋', '💌', '🌹', '💍', '🏡',
 export const WISH_CATEGORIES = [
   { key: 'trip', emoji: '✈️', label: 'Reise' },
   { key: 'food', emoji: '🍝', label: 'Essen' },
+  { key: 'recipe', emoji: '👩‍🍳', label: 'Rezept' },
   { key: 'activity', emoji: '🎡', label: 'Erlebnis' },
   { key: 'date', emoji: '🌹', label: 'Date' },
   { key: 'other', emoji: '✨', label: 'Sonstiges' },

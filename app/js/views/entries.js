@@ -17,7 +17,7 @@ function filtered() {
   if (state.cat === 'gift' && state.giftFrom !== 'all') list = list.filter((e) => e.data.extra?.from === state.giftFrom);
   const q = state.q.trim().toLowerCase();
   if (q) {
-    list = list.filter((e) => [e.data.title, e.data.notes, e.data.place?.name, e.data.place?.label, e.data.extra?.cuisine, e.data.extra?.dish, e.data.extra?.highlights]
+    list = list.filter((e) => [e.data.title, e.data.notes, e.data.place?.name, e.data.place?.label, e.data.extra?.cuisine, e.data.extra?.dish, e.data.extra?.highlights, e.data.extra?.ingredients, e.data.extra?.tips, e.data.extra?.course]
       .filter(Boolean).join(' ').toLowerCase().includes(q));
   }
   if (state.sort === 'rating') return list.sort((a, b) => (avgRating(b) ?? -1) - (avgRating(a) ?? -1));
@@ -33,6 +33,23 @@ function paint(el) {
   const avg = avgAll.length ? avgAll.reduce((a, b) => a + b, 0) / avgAll.length : null;
 
   let giftStats = '';
+  if (state.cat === 'recipe') {
+    const wishes = all('wish').filter((w) => w.data.category === 'recipe' && !w.data.done);
+    const again = entries.filter((e) => e.data.category === 'recipe' && e.data.extra?.again === 'yes').length;
+    giftStats = html`
+      <div class="row" style="gap:10px;margin-bottom:14px">
+        <a class="card card-link grow" href="#/bucket" style="padding:12px 14px">
+          <div style="font-size:20px">🌠</div>
+          <div style="font-weight:600;margin-top:4px">${wishes.length} ${wishes.length === 1 ? 'Rezept' : 'Rezepte'}</div>
+          <div class="muted" style="font-size:13px">wollen wir noch kochen</div>
+        </a>
+        <div class="card grow" style="padding:12px 14px">
+          <div style="font-size:20px">🔁</div>
+          <div style="font-weight:600;margin-top:4px">${again} ${again === 1 ? 'Rezept' : 'Rezepte'}</div>
+          <div class="muted" style="font-size:13px">kochen wir wieder</div>
+        </div>
+      </div>`;
+  }
   if (state.cat === 'gift') {
     const gifts = entries.filter((e) => e.data.category === 'gift');
     const from = (s) => gifts.filter((g) => g.data.extra?.from === s);
@@ -94,6 +111,10 @@ function paint(el) {
     </div>`);
 
   afterPaint(el);
+  // Aktiven Filter in der Chip-Leiste sichtbar machen
+  const chips = el.querySelector('.chips');
+  const act = chips?.querySelector('.chip.active');
+  if (chips && act) chips.scrollLeft = Math.max(0, act.offsetLeft - chips.clientWidth / 2 + act.clientWidth / 2);
 }
 
 export function render(el, _p, query) {

@@ -6,6 +6,7 @@ export const EVENT_CATEGORIES = [
   { key: 'date', label: 'Date', emoji: '🌹', color: '#ff375f' },
   { key: 'meet', label: 'Treffen', emoji: '🤝', color: '#0a84ff' },
   { key: 'food', label: 'Essen', emoji: '🍝', color: '#ff9f0a' },
+  { key: 'cook', label: 'Kochen', emoji: '👩‍🍳', color: '#ff6b35' },
   { key: 'activity', label: 'Aktivität', emoji: '🎡', color: '#30d158' },
   { key: 'trip', label: 'Reise', emoji: '✈️', color: '#40c8e0' },
   { key: 'people', label: 'Familie & Freunde', emoji: '👨‍👩‍👧', color: '#bf5af2' },
@@ -14,7 +15,7 @@ export const EVENT_CATEGORIES = [
 export const eventCat = (key) => EVENT_CATEGORIES.find((c) => c.key === key) || EVENT_CATEGORIES[EVENT_CATEGORIES.length - 1];
 
 /** Passende Erlebnis-Kategorie, wenn ein Termin als Erinnerung festgehalten wird. */
-export const ENTRY_CATEGORY_FOR = { date: 'date', meet: 'activity', food: 'food', activity: 'activity', trip: 'trip', people: 'activity', other: 'activity' };
+export const ENTRY_CATEGORY_FOR = { date: 'date', meet: 'activity', food: 'food', cook: 'recipe', activity: 'activity', trip: 'trip', people: 'activity', other: 'activity' };
 
 export const REPEATS = [
   { key: 'none', label: 'Nie' },
