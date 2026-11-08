@@ -5,7 +5,7 @@ import { all, get, save, update, remove, uuid, me, partner, nameOf } from '../st
 import { fmtDate, fmtDateLong, today, daysBetween } from '../model.js';
 import { topbar, emptyState } from '../ui/components.js';
 import { openSheet, confirmDialog, toast, actionSheet } from '../ui/sheet.js';
-import { heartBurst, heartRain } from '../ui/fx.js';
+import { heartBurst } from '../ui/fx.js';
 import { afterPaint } from '../router.js';
 
 const state = { tab: 'to' };
@@ -73,7 +73,6 @@ function openLetter(l, from) {
     update(l.id, { readAt: new Date().toISOString() });
     setTimeout(() => {
       if (from) { const r = from.getBoundingClientRect(); heartBurst(r.left + r.width / 2, r.top + r.height / 2, 16); }
-      heartRain(16);
     }, 400);
   }
   sheet.el.addEventListener('click', async (e) => {
@@ -116,14 +115,14 @@ export function openLetterForm({ id = null } = {}) {
     },
     body: html`
       <div class="form">
-        <div class="letter-paper" style="animation:none;padding:20px 18px">
+        <div class="letter-paper" style="animation:none">
           <div class="greet">Für ${nameOf(to)} ♡</div>
-          <textarea id="lt" class="input" rows="10" placeholder="Schreib, was du fühlst …" style="color:#3e2a26;font-family:var(--font-serif);font-size:18px;line-height:1.7;min-height:260px">${existing?.data.text || ''}</textarea>
+          <textarea id="lt" class="input" rows="10" placeholder="Schreib, was du fühlst …">${existing?.data.text || ''}</textarea>
           <div class="sign">— ${nameOf(me())}</div>
         </div>
         <div>
           <div class="group">
-            <div class="cell"><span class="cell-icon" style="background:rgba(184,166,255,.18);color:var(--lilac)">${icon('lock')}</span><label>Zeitkapsel</label><span class="toggle"><input type="checkbox" id="lc" ${existing?.data.openAt ? 'checked' : ''}><span></span></span></div>
+            <div class="cell"><span class="cell-icon purple">${icon('lock')}</span><label>Zeitkapsel</label><span class="toggle"><input type="checkbox" id="lc" ${existing?.data.openAt ? 'checked' : ''}><span></span></span></div>
             <div class="cell ${existing?.data.openAt ? '' : 'hidden'}" id="lo-cell"><label>Öffnen ab</label><input type="date" id="lo" min="${today()}" value="${existing?.data.openAt || ''}"></div>
           </div>
           <div class="group-foot">Als Zeitkapsel bleibt der Brief bis zum gewählten Tag verschlossen – perfekt für Jahrestage oder Geburtstage.</div>

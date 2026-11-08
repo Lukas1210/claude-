@@ -212,6 +212,19 @@ export function render(el, _params, query) {
     c.restore();
   }
 
+  function readPalette() {
+    const cs = getComputedStyle(document.documentElement);
+    const v = (n) => cs.getPropertyValue(n).trim();
+    return {
+      ocean: v('--globe-ocean'), ocean2: v('--globe-ocean2'), land: v('--globe-land'), border: v('--globe-border'),
+      grid: v('--globe-grid'), glow: v('--globe-glow'), accent: v('--accent'), accent2: v('--accent2'),
+      dark: cs.colorScheme === 'dark' || v('color-scheme') === 'dark',
+    };
+  }
+  let pal = readPalette();
+  const onTheme = () => { pal = readPalette(); needsDraw = true; detailDrawn = false; };
+  window.addEventListener('themechange', onTheme);
+
   function draw(t) {
     if (!geo || !W) return;
     const d3 = window.d3;
@@ -224,54 +237,46 @@ export function render(el, _params, query) {
     const data = useDetail ? detail : geo;
     ctx.clearRect(0, 0, W, H);
 
-    // Atmosphäre
-    const atm = ctx.createRadialGradient(cx, cy, R * 0.92, cx, cy, R * 1.22);
-    atm.addColorStop(0, 'rgba(255,143,163,0.35)');
-    atm.addColorStop(0.35, 'rgba(184,166,255,0.14)');
-    atm.addColorStop(1, 'rgba(184,166,255,0)');
+    // Dezenter Schein
+    const atm = ctx.createRadialGradient(cx, cy, R * 0.96, cx, cy, R * 1.14);
+    atm.addColorStop(0, pal.glow);
+    atm.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = atm;
-    ctx.beginPath(); ctx.arc(cx, cy, R * 1.22, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx, cy, R * 1.14, 0, Math.PI * 2); ctx.fill();
 
     // Ozean
     const ocean = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.1, cx, cy, R);
-    ocean.addColorStop(0, '#2d2b62');
-    ocean.addColorStop(0.7, '#191838');
-    ocean.addColorStop(1, '#100f26');
+    ocean.addColorStop(0, pal.ocean);
+    ocean.addColorStop(1, pal.ocean2);
     ctx.fillStyle = ocean;
     ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
 
     // Gradnetz
     ctx.beginPath(); path(d3.geoGraticule10());
-    ctx.strokeStyle = 'rgba(255,255,255,0.055)'; ctx.lineWidth = 0.6; ctx.stroke();
+    ctx.strokeStyle = pal.grid; ctx.lineWidth = 0.6; ctx.stroke();
 
     // Land
     ctx.beginPath();
     for (const f of data.countries) if (!visited.has(String(f.id ?? f.properties.name))) path(f);
-    ctx.fillStyle = '#3b3566'; ctx.fill();
+    ctx.fillStyle = pal.land; ctx.fill();
 
     // Besuchte Länder
     if (visited.size) {
-      ctx.save();
       ctx.beginPath();
       for (const f of data.countries) if (visited.has(String(f.id ?? f.properties.name))) path(f);
-      const vg = ctx.createLinearGradient(cx - R, cy - R, cx + R, cy + R);
-      vg.addColorStop(0, '#ffb3c1'); vg.addColorStop(1, '#ff6b8b');
-      ctx.fillStyle = vg;
-      ctx.shadowColor = 'rgba(255,107,139,0.8)';
-      ctx.shadowBlur = 14;
+      ctx.fillStyle = pal.accent;
       ctx.fill();
-      ctx.restore();
     }
 
     // Grenzen
     ctx.beginPath(); path(data.borders);
-    ctx.strokeStyle = 'rgba(255,255,255,0.16)'; ctx.lineWidth = 0.5; ctx.stroke();
+    ctx.strokeStyle = pal.border; ctx.lineWidth = 0.6; ctx.stroke();
 
-    // Lichtkante
-    const rim = ctx.createRadialGradient(cx - R * 0.3, cy - R * 0.35, R * 0.2, cx, cy, R * 1.02);
-    rim.addColorStop(0, 'rgba(255,255,255,0.07)');
-    rim.addColorStop(0.75, 'rgba(255,255,255,0)');
-    rim.addColorStop(1, 'rgba(0,0,0,0.35)');
+    // Leichte Schattierung am Rand (3D-Eindruck)
+    const rim = ctx.createRadialGradient(cx - R * 0.3, cy - R * 0.35, R * 0.3, cx, cy, R * 1.02);
+    rim.addColorStop(0, 'rgba(255,255,255,0)');
+    rim.addColorStop(0.8, 'rgba(0,0,0,0)');
+    rim.addColorStop(1, pal.dark ? 'rgba(0,0,0,0.35)' : 'rgba(0,0,0,0.1)');
     ctx.fillStyle = rim;
     ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
 
@@ -293,15 +298,12 @@ export function render(el, _params, query) {
         if (pt.visible) { pen ? ctx.lineTo(pt.X, pt.Y) : ctx.moveTo(pt.X, pt.Y); pen = true; }
         else pen = false;
       }
-      ctx.strokeStyle = 'rgba(243,217,177,0.85)';
-      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = pal.accent2;
+      ctx.lineWidth = 1.6;
       ctx.setLineDash([6, 5]);
       ctx.lineDashOffset = -dash;
-      ctx.shadowColor = 'rgba(243,217,177,0.6)';
-      ctx.shadowBlur = 6;
       ctx.stroke();
       ctx.setLineDash([]);
-      ctx.shadowBlur = 0;
     }
 
     // Zuhause
@@ -311,9 +313,8 @@ export function render(el, _params, query) {
       const p = project3d(rot, home.lng, home.lat);
       if (p.z > 0) {
         ctx.beginPath(); ctx.arc(p.X, p.Y, 6, 0, Math.PI * 2);
-        ctx.fillStyle = '#f3d9b1'; ctx.fill();
-        ctx.beginPath(); ctx.arc(p.X, p.Y, 10, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(243,217,177,0.6)'; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.fillStyle = pal.accent2; ctx.fill();
+        ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.stroke();
       }
     }
 
@@ -327,20 +328,23 @@ export function render(el, _params, query) {
       if (isSel) {
         ctx.beginPath();
         ctx.arc(pt.X, pt.Y, 14 + pulse * 10, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,107,139,${0.35 - pulse * 0.3})`;
+        ctx.globalAlpha = fade * (0.3 - pulse * 0.25);
+        ctx.fillStyle = pal.accent;
         ctx.fill();
+        ctx.globalAlpha = fade;
       }
       const size = (p.trip ? 20 : 15) * (isSel ? 1.25 : 1) * Math.min(1.3, 0.85 + zoom * 0.15);
       ctx.save();
-      ctx.shadowColor = 'rgba(255,107,139,0.9)';
-      ctx.shadowBlur = 10;
+      ctx.shadowColor = 'rgba(0,0,0,0.3)';
+      ctx.shadowBlur = 4;
+      ctx.shadowOffsetY = 1;
       heartPath(ctx, pt.X, pt.Y, size);
-      ctx.fillStyle = p.trip ? '#ff6b8b' : '#ff9fb1';
+      ctx.fillStyle = pal.accent;
       ctx.fill();
       ctx.restore();
       heartPath(ctx, pt.X, pt.Y, size);
-      ctx.strokeStyle = 'rgba(255,255,255,0.85)';
-      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.4;
       ctx.stroke();
       if (p.entries.length > 1) {
         ctx.font = '700 10px -apple-system, sans-serif';
@@ -527,6 +531,7 @@ export function render(el, _params, query) {
     cancelAnimationFrame(raf);
     ro.disconnect();
     unsub();
+    window.removeEventListener('themechange', onTheme);
     el.removeEventListener('click', onClick);
   };
 }

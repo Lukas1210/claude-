@@ -43,7 +43,7 @@ function paint(el) {
   let idx = 0;
 
   el.innerHTML = String(html`
-    ${topbar({ title: 'Galerie', right: html`<button class="icon-btn" data-act="add" aria-label="Fotos hinzufügen">${icon('plus')}</button>` })}
+    ${topbar({ title: 'Galerie', back: true, right: html`<button class="icon-btn" data-act="add" aria-label="Fotos hinzufügen">${icon('plus')}</button>` })}
     <div class="page">
       <h1 class="large-title">Galerie</h1>
       <p class="page-sub">${photos.length ? `${photos.length} ${photos.length === 1 ? 'Foto' : 'Fotos'} · ${favs} ${favs === 1 ? 'Favorit' : 'Favoriten'}` : 'Alle eure gemeinsamen Momente'}</p>

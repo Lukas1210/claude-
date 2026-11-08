@@ -10,7 +10,6 @@ const { chromium } = createRequire(import.meta.url)('playwright');
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'app');
 const svg = readFileSync(`${root}/assets/icons/icon.svg`, 'utf8');
 const svgData = `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
-const font = (f) => `data:font/woff2;base64,${readFileSync(`${root}/assets/fonts/${f}`).toString('base64')}`;
 
 // Aktuelle iPhones (CSS-Breite × Höhe @ Pixeldichte)
 const DEVICES = [
@@ -35,7 +34,7 @@ async function icon(size, file, { maskable = false } = {}) {
   // Maskierbare Icons: Motiv in die sichere Zone (80 %) verkleinern, Hintergrund randlos
   const inner = maskable ? 0.8 : 1;
   const off = (size * (1 - inner)) / 2;
-  const html = `<html><body style="margin:0;overflow:hidden;background:#141428">
+  const html = `<html><body style="margin:0;overflow:hidden;background:#e62e5c">
     <img src="${svgData}" style="position:absolute;left:0;top:0;width:${size}px;height:${size}px;display:block">
     ${maskable ? `<img src="${svgData}" style="position:absolute;left:${off}px;top:${off}px;width:${size * inner}px;height:${size * inner}px;display:block">` : ''}
   </body></html>`;
@@ -51,22 +50,20 @@ await icon(512, `${root}/assets/icons/icon-512.png`);
 await icon(512, `${root}/assets/icons/maskable-512.png`, { maskable: true });
 
 const links = [];
+const SCHEMES = { light: '#f2f2f7', dark: '#0b0b0e' };
 for (const [w, h, dpr] of DEVICES) {
-  const pw = w * dpr, ph = h * dpr;
-  const file = `splash-${pw}x${ph}.png`;
-  const html = `<html><head><style>
-    @font-face{font-family:P;font-style:italic;font-weight:600;src:url(${font('playfair-display-latin-600-italic.woff2')})}
-    body{margin:0;width:${w}px;height:${h}px;overflow:hidden;background:linear-gradient(180deg,#141428 0%,#1b1937 55%,#221d40 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:P,serif;color:#f7eef4}
-    img{width:112px;height:112px;border-radius:26px;box-shadow:0 20px 60px -10px rgba(255,120,150,.55)}
-    h1{font-style:italic;font-weight:600;font-size:30px;margin:26px 0 0;letter-spacing:.2px}
-    h1 span{color:#ff8fa3}
-  </style></head><body><img src="${svgData}"><h1>Couple <span>Journal</span></h1></body></html>`;
-  const p2 = await browser.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: dpr });
-  await p2.setContent(html, { waitUntil: 'load' });
-  await p2.evaluate(() => document.fonts.ready);
-  writeFileSync(`${root}/assets/splash/${file}`, await p2.screenshot({ type: 'png' }));
-  await p2.close();
-  links.push(`  <link rel="apple-touch-startup-image" media="(device-width: ${w}px) and (device-height: ${h}px) and (-webkit-device-pixel-ratio: ${dpr}) and (orientation: portrait)" href="assets/splash/${file}">`);
+  for (const [scheme, bg] of Object.entries(SCHEMES)) {
+    const pw = w * dpr, ph = h * dpr;
+    const file = `splash-${pw}x${ph}-${scheme}.png`;
+    // Ruhiges Startbild: einfarbiger Hintergrund wie die App, Icon in der Mitte
+    const html = `<html><body style="margin:0;width:${w}px;height:${h}px;overflow:hidden;background:${bg};display:grid;place-items:center">
+      <img src="${svgData}" style="width:84px;height:84px;border-radius:19px;box-shadow:0 10px 30px -10px rgba(0,0,0,.35)"></body></html>`;
+    const p2 = await browser.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: dpr });
+    await p2.setContent(html, { waitUntil: 'load' });
+    writeFileSync(`${root}/assets/splash/${file}`, await p2.screenshot({ type: 'png' }));
+    await p2.close();
+    links.push(`  <link rel="apple-touch-startup-image" media="(device-width: ${w}px) and (device-height: ${h}px) and (-webkit-device-pixel-ratio: ${dpr}) and (orientation: portrait) and (prefers-color-scheme: ${scheme})" href="assets/splash/${file}">`);
+  }
 }
 await browser.close();
 

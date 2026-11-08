@@ -205,13 +205,16 @@ export async function syncNow({ silent = false } = {}) {
       const { fromPartner } = await syncWith(backend);
       setStatus({ state: 'idle', message: 'Alles synchronisiert', lastSync: new Date().toISOString() });
       await metaDB.set('lastSync', status.lastSync);
-      const interesting = fromPartner.filter((r) => ['entry', 'milestone', 'letter', 'wish'].includes(r.type));
+      const interesting = fromPartner.filter((r) => ['entry', 'milestone', 'letter', 'wish', 'event'].includes(r.type));
       const photos = fromPartner.filter((r) => r.type === 'photo').length;
       if (!silent && (interesting.length || photos)) {
         const { toast } = await import('./ui/sheet.js');
         const letter = interesting.find((r) => r.type === 'letter' && r.data?.to === me());
         const who = nameOf(partner());
+        const event = interesting.find((r) => r.type === 'event');
         if (letter) toast(`${who} hat dir einen Liebesbrief geschrieben`, { emoji: '💌', duration: 4000 });
+        else if (event && event.created_by === me()) toast(`${who} hat auf „${event.data?.title || 'deinen Termin'}“ geantwortet`, { emoji: '📅', duration: 4000 });
+        else if (event) toast(`${who} hat einen Termin eingetragen: ${event.data?.title || ''}`, { emoji: '📅', duration: 4000 });
         else if (interesting.length) toast(`${who} hat etwas Neues hinzugefügt ♡`, { emoji: '✨', duration: 3500 });
         else toast(`${who} hat ${photos === 1 ? 'ein Foto' : `${photos} Fotos`} hinzugefügt`, { emoji: '📸', duration: 3500 });
       }
@@ -304,6 +307,24 @@ export async function setCredentials(url, key) {
   await setDevice({ supabaseUrl: url.trim(), supabaseAnonKey: key.trim() });
   await metaDB.delete('syncCursor');
   await initSync();
+}
+
+/**
+ * Termin als .ics-Datei im privaten Speicher ablegen und einen kurzlebigen Link liefern.
+ * Safari öffnet solche Links mit „Zum Kalender hinzufügen“. Ohne Sync: null.
+ */
+export async function publishIcs(id, text) {
+  if (!backend || !client) return null;
+  try {
+    const path = `ics/${id}.ics`;
+    const bucket = client.storage.from('photos');
+    const { error } = await bucket.upload(path, new Blob([text], { type: 'text/calendar' }), { upsert: true, contentType: 'text/calendar; charset=utf-8', cacheControl: '0' });
+    if (error) return null;
+    const { data } = await bucket.createSignedUrl(path, 600);
+    return data?.signedUrl || null;
+  } catch {
+    return null;
+  }
 }
 
 /** Für den Fall, dass vollständig neu geladen werden soll. */

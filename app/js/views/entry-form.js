@@ -19,7 +19,7 @@ const TITLE_HINT = {
   gift: 'Was war das Geschenk?',
 };
 
-export function openEntryForm({ category = 'date', id = null, prefill = {}, wishId = null } = {}) {
+export function openEntryForm({ category = 'date', id = null, prefill = {}, wishId = null, onSaved = null } = {}) {
   const existing = id ? get(id) : null;
   const d = existing ? structuredClone(existing.data) : {};
   const st = {
@@ -107,7 +107,7 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
     const r = st.ratings[slot] || {};
     return html`
       <div class="cell col">
-        <label style="font-family:var(--font-serif);font-style:italic;font-size:16px;color:var(--text)">${nameOf(slot)}${slot === me() ? ' (du)' : ''}</label>
+        <label style="font-weight:600;font-size:15px;color:var(--text)">${nameOf(slot)}${slot === me() ? ' (du)' : ''}</label>
         <div data-hearts="${slot}"></div>
         <input data-comment="${slot}" placeholder="Kommentar (optional)" value="${r.comment || ''}" style="font-size:15px">
       </div>`;
@@ -254,6 +254,7 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
         if (p && p.data.entryId !== st.id) await update(pid, { entryId: st.id });
       }
       if (wishId && get(wishId)) await update(wishId, { done: true, doneAt: today(), entryId: st.id });
+      if (onSaved) await onSaved(st.id);
       saved = true;
       const r = btn.getBoundingClientRect();
       heartBurst(r.left + r.width / 2, r.top + r.height / 2, 14);

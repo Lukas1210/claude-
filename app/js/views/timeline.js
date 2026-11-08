@@ -92,10 +92,10 @@ function paint(el) {
   const rows = [];
   const startNode = s.startDate ? html`
     <div class="tl-item start">
-      <div class="tl-mile" style="background:linear-gradient(135deg, rgba(243,217,177,.18), rgba(255,143,163,.1));border-color:rgba(243,217,177,.35)">
+      <div class="tl-mile start-node">
         <span class="em">💫</span>
         <h3>Hier hat alles begonnen</h3>
-        <div class="date" style="color:var(--champ)">${fmtDate(s.startDate, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</div>
+        <div class="date">${fmtDate(s.startDate, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</div>
       </div>
     </div>` : '';
   const nowNode = html`<div class="tl-now">Heute · ${fmtDate(today(), { day: 'numeric', month: 'long', year: 'numeric' })} ♡</div>`;

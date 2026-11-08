@@ -2,7 +2,6 @@
 import { html } from '../ui/dom.js';
 import { saveSettings, setDevice, settings, all } from '../store.js';
 import { isConfigured, login } from '../sync.js';
-import { heartRain } from '../ui/fx.js';
 import { toast } from '../ui/sheet.js';
 import { today } from '../model.js';
 
@@ -14,7 +13,6 @@ export function runOnboarding() {
     const data = { a: '', b: '', startDate: '' };
 
     const finish = async () => {
-      heartRain(30);
       root.style.transition = 'opacity .5s ease';
       root.style.opacity = '0';
       setTimeout(() => { root.remove(); resolve(); }, 500);
@@ -79,7 +77,6 @@ export function runOnboarding() {
           <p class="lead">Fügt euer erstes Erlebnis hinzu, bewertet es mit Herzen und füllt euren Globus mit Erinnerungen.</p>
           <div class="actions"><button class="btn primary block" data-go="finish">Los geht's</button></div>
         </div>`);
-      heartRain(18);
     }
 
     function connect(err = '') {

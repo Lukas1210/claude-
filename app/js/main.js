@@ -1,7 +1,7 @@
 // App-Start: Daten laden, Hülle aufbauen, Router starten, Service Worker & Sync.
 import { loadStore, getDevice } from './store.js';
 import { route, startRouter, go, currentRoute } from './router.js';
-import { startStars } from './ui/fx.js';
+import { applyTheme } from './theme.js';
 import { actionSheet, toast } from './ui/sheet.js';
 import { icon } from './ui/icons.js';
 import { html } from './ui/dom.js';
@@ -15,6 +15,8 @@ const views = {
   entry: () => import('./views/entry-detail.js'),
   globe: () => import('./views/globe.js'),
   gallery: () => import('./views/gallery.js'),
+  calendar: () => import('./views/calendar.js'),
+  event: () => import('./views/event-detail.js'),
   bucket: () => import('./views/bucket.js'),
   letters: () => import('./views/letters.js'),
   stats: () => import('./views/stats.js'),
@@ -22,11 +24,13 @@ const views = {
 };
 
 route('/', views.home, { tab: 'home', root: true });
+route('/calendar', views.calendar, { tab: 'calendar', root: true });
 route('/timeline', views.timeline, { tab: 'timeline', root: true });
 route('/entries', views.entries, { tab: 'entries', root: true });
 route('/globe', views.globe, { tab: 'globe', root: true, fab: false });
-route('/gallery', views.gallery, { tab: 'gallery', root: true });
+route('/gallery', views.gallery, { tab: 'home' });
 route('/entry/:id', views.entry, { fab: false });
+route('/event/:id', views.event, { fab: false });
 route('/bucket', views.bucket, { tab: 'home' });
 route('/letters', views.letters, { tab: 'home' });
 route('/stats', views.stats, { tab: 'home', fab: false });
@@ -34,10 +38,10 @@ route('/settings', views.settings, { tab: 'home', fab: false });
 
 const TAB_DEF = [
   { tab: 'home', path: '/', label: 'Wir', icon: 'heart' },
+  { tab: 'calendar', path: '/calendar', label: 'Kalender', icon: 'calendar' },
   { tab: 'timeline', path: '/timeline', label: 'Timeline', icon: 'timeline' },
   { tab: 'entries', path: '/entries', label: 'Erlebnisse', icon: 'sparkles' },
   { tab: 'globe', path: '/globe', label: 'Globus', icon: 'globe' },
-  { tab: 'gallery', path: '/gallery', label: 'Galerie', icon: 'gallery' },
 ];
 
 function buildShell() {
@@ -56,7 +60,12 @@ function buildShell() {
 
   const fab = document.getElementById('fab');
   fab.innerHTML = String(icon('plus'));
-  fab.addEventListener('click', openAddMenu);
+  fab.addEventListener('click', () => {
+    // Im Kalender legt "+" direkt einen Termin am gewählten Tag an
+    const cur = currentRoute();
+    if (cur?.route.tab === 'calendar' && cur.route.root && cur.mod?.addEvent) cur.mod.addEvent();
+    else openAddMenu();
+  });
 }
 
 let fileInput;
@@ -81,6 +90,7 @@ export function photoInput() {
 
 export async function openAddMenu() {
   const items = [
+    { label: 'Termin', emoji: '📅', value: 'event' },
     ...Object.values(CATEGORIES).map((c) => ({ label: c.label, emoji: c.emoji, value: `entry:${c.key}` })),
     { label: 'Meilenstein', emoji: '💞', value: 'milestone' },
     { label: 'Fotos', emoji: '📸', value: 'photos', onSelect: () => photoInput().click() },
@@ -89,7 +99,10 @@ export async function openAddMenu() {
   ];
   const v = await actionSheet({ title: 'Neue Erinnerung', items, layout: 'grid' });
   if (!v) return;
-  if (v.startsWith('entry:')) {
+  if (v === 'event') {
+    const { openEventForm } = await import('./views/event-form.js');
+    openEventForm();
+  } else if (v.startsWith('entry:')) {
     const { openEntryForm } = await import('./views/entry-form.js');
     openEntryForm({ category: v.split(':')[1] });
   } else if (v === 'milestone') {
@@ -140,7 +153,7 @@ async function boot() {
     document.getElementById('view').innerHTML = '<div class="empty"><span class="em">😢</span><h3>Speicher nicht verfügbar</h3><p>Bitte öffne die App nicht im privaten Modus.</p></div>';
     return;
   }
-  startStars(document.getElementById('stars'));
+  applyTheme();
   buildShell();
   registerSW();
   const splash = document.getElementById('splash');
