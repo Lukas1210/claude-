@@ -1,11 +1,11 @@
-// Formular zum Anlegen/Bearbeiten eines Erlebnisses (Date, Aktivität, Essen, Reise, Geschenk).
+// Formular zum Anlegen/Bearbeiten eines Erlebnisses (alle Kategorien).
 import { html } from '../ui/dom.js';
 import { icon } from '../ui/icons.js';
 import { openSheet, confirmDialog, toast, actionSheet } from '../ui/sheet.js';
-import { mountHeartInput } from '../ui/components.js';
-import { heartBurst } from '../ui/fx.js';
+import { mountHeartInput, catIcon } from '../ui/components.js';
+import { sparkBurst } from '../ui/fx.js';
 import { pickPlace } from '../ui/place-picker.js';
-import { CATEGORIES, EXTRA_FIELDS, today } from '../model.js';
+import { CATEGORIES, EXTRA_FIELDS, today, normalizeExtra } from '../model.js';
 import { get, save, update, uuid, me, partner, nameOf } from '../store.js';
 import { processFiles, commitPhotos, discardPending, deletePhotos, photoUrl } from '../photos.js';
 import { reversePlace, flag } from '../geo.js';
@@ -18,6 +18,7 @@ const TITLE_HINT = {
   trip: 'Wohin ging die Reise?',
   gift: 'Was war das Geschenk?',
   recipe: 'Welches Gericht habt ihr gekocht?',
+  movie: 'Welcher Film, welche Serie?',
 };
 
 export function openEntryForm({ category = 'date', id = null, prefill = {}, wishId = null, onSaved = null } = {}) {
@@ -33,7 +34,7 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
     ratings: d.ratings || { a: { value: null, comment: '' }, b: { value: null, comment: '' } },
     notes: d.notes ?? prefill.notes ?? '',
     favorite: !!d.favorite,
-    extra: d.extra || {},
+    extra: normalizeExtra(d.category || category, d.extra || {}),
     photoIds: (d.photoIds || []).filter((pid) => get(pid)),
     coverId: d.coverId || null,
   };
@@ -47,7 +48,7 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
   let saved = false;
 
   const sheet = openSheet({
-    title: existing ? 'Bearbeiten' : 'Neue Erinnerung',
+    title: existing ? 'Bearbeiten' : 'Neuer Eintrag',
     full: true,
     left: html`<button class="text-btn" data-act="cancel">Abbrechen</button>`,
     right: html`<button class="text-btn strong" data-act="save">Sichern</button>`,
@@ -73,7 +74,7 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
       case 'number':
         return html`<div class="cell"><label>${f.label}</label><input data-xi="${f.key}" inputmode="numeric" pattern="[0-9]*" placeholder="${f.placeholder || ''}" value="${v ?? ''}" style="text-align:right"><span class="muted">${f.unit || ''}</span></div>`;
       case 'who':
-        return html`<div class="cell col"><label>${f.label}</label><div class="opt-row">${opt('a', nameOf('a'))}${opt('b', nameOf('b'))}${opt('both', '👫 Zusammen')}</div></div>`;
+        return html`<div class="cell col"><label>${f.label}</label><div class="opt-row">${opt('a', nameOf('a'))}${opt('b', nameOf('b'))}${opt('both', 'Zusammen')}</div></div>`;
       case 'money':
         return html`<div class="cell"><label>${f.label}</label><input data-xi="${f.key}" inputmode="decimal" placeholder="0" value="${v ?? ''}" style="text-align:right"><span class="muted">€</span></div>`;
       case 'select':
@@ -128,7 +129,7 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
     const longFields = fields.filter((f) => f.type === 'textarea');
     body.innerHTML = String(html`
       <div class="form">
-        ${!existing ? html`<div class="chips" style="margin-top:-4px">${Object.values(CATEGORIES).map((c) => html`<button type="button" class="chip ${st.category === c.key ? 'active' : ''}" data-cat="${c.key}">${c.emoji} ${c.label}</button>`)}</div>` : ''}
+        ${!existing ? html`<div class="chips" style="margin-top:-4px">${Object.values(CATEGORIES).map((c) => html`<button type="button" class="chip ${st.category === c.key ? 'active' : ''}" data-cat="${c.key}">${catIcon(c)} ${c.label}</button>`)}</div>` : ''}
 
         <div>
           <div class="photo-strip" id="photos"></div>
@@ -139,9 +140,9 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
 
         <div>
           <div class="group">
-            <div class="cell"><label>${st.category === 'trip' ? 'Von' : st.category === 'recipe' ? 'Gekocht am' : 'Datum'}</label><input type="date" id="date" value="${st.date}"></div>
+            <div class="cell"><label>${st.category === 'trip' ? 'Von' : st.category === 'recipe' ? 'Gekocht am' : st.category === 'movie' ? 'Geschaut am' : 'Datum'}</label><input type="date" id="date" value="${st.date}"></div>
             ${st.category === 'trip' ? html`<div class="cell"><label>Bis</label><input type="date" id="endDate" value="${st.endDate}" min="${st.date}"></div>` : ''}
-            ${st.category !== 'recipe' ? html`<button type="button" class="cell link" id="place-cell" data-act="place" style="width:100%;text-align:left"></button>` : ''}
+            ${!CATEGORIES[st.category].noPlace ? html`<button type="button" class="cell link" id="place-cell" data-act="place" style="width:100%;text-align:left"></button>` : ''}
           </div>
         </div>
 
@@ -167,14 +168,14 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
         ${st.category !== 'recipe' ? html`
         <div>
           <div class="group-label">Notizen</div>
-          <div class="group"><div class="cell col"><textarea id="notes" rows="4" placeholder="Was wir nicht vergessen wollen …">${st.notes}</textarea></div></div>
+          <div class="group"><div class="cell col"><textarea id="notes" rows="4" placeholder="Was ihr euch merken wollt …">${st.notes}</textarea></div></div>
         </div>` : ''}
 
         <div class="group">
-          <div class="cell"><span class="cell-icon amber">${icon('starFill')}</span><label>${st.category === 'recipe' ? 'Lieblingsrezept' : 'Lieblingsmoment'}</label><span class="toggle"><input type="checkbox" id="fav" ${st.favorite ? 'checked' : ''}><span></span></span></div>
+          <div class="cell"><span class="cell-icon amber">${icon('starFill')}</span><label>${st.category === 'recipe' ? 'Lieblingsrezept' : 'Favorit'}</label><span class="toggle"><input type="checkbox" id="fav" ${st.favorite ? 'checked' : ''}><span></span></span></div>
         </div>
 
-        ${existing ? html`<button type="button" class="btn danger block" data-act="delete">${icon('trash')} Erinnerung löschen</button>` : ''}
+        ${existing ? html`<button type="button" class="btn danger block" data-act="delete">${icon('trash')} Löschen</button>` : ''}
         <input type="file" id="file" accept="image/*" multiple hidden>
       </div>`);
     renderPhotos();
@@ -258,7 +259,7 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
         title: st.title,
         date: st.date,
         endDate: st.category === 'trip' ? st.endDate || null : null,
-        place: st.category === 'recipe' ? null : st.place,
+        place: CATEGORIES[st.category].noPlace ? null : st.place,
         ratings: st.ratings,
         notes: st.notes,
         favorite: st.favorite,
@@ -277,8 +278,8 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
       if (onSaved) await onSaved(st.id);
       saved = true;
       const r = btn.getBoundingClientRect();
-      heartBurst(r.left + r.width / 2, r.top + r.height / 2, 14);
-      toast(existing ? 'Gespeichert' : 'Erinnerung gespeichert ♡', { emoji: CATEGORIES[st.category].emoji });
+      sparkBurst(r.left + r.width / 2, r.top + r.height / 2, 14);
+      toast('Gespeichert', { icon: CATEGORIES[st.category].icon });
       sheet.close(undefined, true);
       if (!existing) setTimeout(() => go(`/entry/${st.id}`), 250);
     } catch (e) {
@@ -331,7 +332,7 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
         break;
       }
       case 'delete': {
-        const ok = await confirmDialog({ title: 'Erinnerung löschen?', message: 'Auch die zugehörigen Fotos werden gelöscht. Das kann nicht rückgängig gemacht werden.', ok: 'Löschen', danger: true });
+        const ok = await confirmDialog({ title: 'Eintrag löschen?', message: 'Auch die zugehörigen Fotos werden gelöscht. Das kann nicht rückgängig gemacht werden.', ok: 'Löschen', danger: true });
         if (!ok) return;
         const { deleteEntry } = await import('./entry-detail.js');
         saved = true;

@@ -25,9 +25,9 @@ export function runOnboarding() {
         <div class="step">
           <img class="logo" src="assets/icons/icon-512.png" alt="">
           <h1>Couple <em>Journal</em></h1>
-          <p class="lead">Euer gemeinsames Tagebuch für Dates, Reisen, Lieblingsessen, Geschenke und all die kleinen großen Momente.</p>
+          <p class="lead">Bewertet alles, was ihr zusammen macht – Dates, Essen, Reisen, Rezepte. Mit Fotos, Kalender, Globus und Statistiken.</p>
           <div class="actions">
-            <button class="btn primary block" data-go="names">Unsere Geschichte beginnen ♡</button>
+            <button class="btn primary block" data-go="names">Loslegen</button>
             ${isConfigured() ? html`<button class="btn ghost block" data-go="connect">Mit Partner verbinden</button>` : ''}
           </div>
         </div>`);
@@ -42,7 +42,7 @@ export function runOnboarding() {
           <div class="form" style="margin-top:26px">
             <div class="group">
               <div class="cell"><label>Du</label><input id="n-a" placeholder="Dein Name" autocomplete="given-name" value="${data.a}"></div>
-              <div class="cell"><label>Dein Schatz</label><input id="n-b" placeholder="Name" value="${data.b}"></div>
+              <div class="cell"><label>Plus eins</label><input id="n-b" placeholder="Name" value="${data.b}"></div>
             </div>
           </div>
           <div class="actions"><button class="btn primary block" data-go="start">Weiter</button></div>
@@ -55,10 +55,10 @@ export function runOnboarding() {
         <div class="step">
           ${dots(1)}
           <h1>Seit wann seid ihr <em>zusammen</em>?</h1>
-          <p class="lead">Ab diesem Tag beginnt eure Timeline – und der Zähler, wie lange ihr schon ein Paar seid.</p>
+          <p class="lead">Ab diesem Tag zählt die App mit – und eure Timeline beginnt.</p>
           <div class="form" style="margin-top:26px">
             <div class="group">
-              <div class="cell"><label>Unser Tag</label><input id="sd" type="date" max="${today()}" placeholder="Datum wählen" value="${data.startDate}"></div>
+              <div class="cell"><label>Tag 1</label><input id="sd" type="date" max="${today()}" placeholder="Datum wählen" value="${data.startDate}"></div>
             </div>
           </div>
           <div class="actions">
@@ -72,9 +72,9 @@ export function runOnboarding() {
       root.innerHTML = String(html`
         <div class="step center">
           ${dots(2)}
-          <div style="font-size:72px;margin-bottom:10px">💞</div>
-          <h1>Willkommen, <em>${data.a}</em> &amp; <em>${data.b}</em></h1>
-          <p class="lead">Fügt euer erstes Erlebnis hinzu, bewertet es mit Herzen und füllt euren Globus mit Erinnerungen.</p>
+          <div class="onb-mark">&amp;</div>
+          <h1>Alles bereit, <em>${data.a}</em> &amp; <em>${data.b}</em></h1>
+          <p class="lead">Legt euer erstes Erlebnis an, bewertet es – und schaut zu, wie sich euer Globus füllt.</p>
           <div class="actions"><button class="btn primary block" data-go="finish">Los geht's</button></div>
         </div>`);
     }
@@ -83,7 +83,7 @@ export function runOnboarding() {
       root.innerHTML = String(html`
         <div class="step">
           <h1>Mit <em>Partner</em> verbinden</h1>
-          <p class="lead">Melde dich mit deinem Konto an. Danach werden alle gemeinsamen Erinnerungen geladen.</p>
+          <p class="lead">Melde dich mit deinem Konto an. Danach werden alle gemeinsamen Einträge geladen.</p>
           <form class="form" id="lf" style="margin-top:26px">
             <div class="group">
               <div class="cell"><label>E-Mail</label><input id="em" type="email" autocomplete="username" inputmode="email" required></div>
@@ -112,7 +112,7 @@ export function runOnboarding() {
       const s = settings();
       const hasData = all('settings').length > 0;
       if (!hasData) {
-        toast('Noch keine gemeinsamen Daten gefunden – richtet die App zuerst ein.', { emoji: 'ℹ️', duration: 4000 });
+        toast('Noch keine gemeinsamen Daten gefunden – richtet die App zuerst ein.', { icon: 'info', duration: 4000 });
         names();
         return;
       }
@@ -147,11 +147,11 @@ export function runOnboarding() {
       if (step === 'start') {
         data.a = root.querySelector('#n-a').value.trim();
         data.b = root.querySelector('#n-b').value.trim();
-        if (!data.a || !data.b) { toast('Bitte beide Namen eintragen', { emoji: '💕' }); return; }
+        if (!data.a || !data.b) { toast('Bitte beide Namen eintragen', { icon: 'user' }); return; }
         start();
       } else if (step === 'done') {
         data.startDate = root.querySelector('#sd').value;
-        if (!data.startDate) { toast('Bitte euren Tag auswählen', { emoji: '📅' }); return; }
+        if (!data.startDate) { toast('Bitte euren Tag 1 auswählen', { icon: 'calendar' }); return; }
         done();
       } else if (step === 'finish') {
         await saveSettings({ names: { a: data.a, b: data.b }, startDate: data.startDate });

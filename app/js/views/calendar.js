@@ -2,9 +2,9 @@
 import { html } from '../ui/dom.js';
 import { icon } from '../ui/icons.js';
 import { all, nameOf, me, partner } from '../store.js';
-import { today, parseDate, isoDate, fmtDate, daysBetween } from '../model.js';
+import { today, parseDate, isoDate, fmtDate, daysBetween, catOf } from '../model.js';
 import { expandEvents, occurrencesOnDay, specialDays, eventCat, fmtTime, eventDuration, relativeDay, occEnd } from '../events.js';
-import { topbar } from '../ui/components.js';
+import { topbar, catIcon } from '../ui/components.js';
 import { afterPaint } from '../router.js';
 import { openEventForm } from './event-form.js';
 import { shortPlace } from '../geo.js';
@@ -41,7 +41,7 @@ export function eventRow({ ev, occ }, { showDate = false } = {}) {
       <span class="bar" style="background:${c.color}"></span>
       <span class="time">${time}</span>
       <span class="body">
-        <span class="t" style="display:block">${c.emoji} ${d.title}</span>
+        <span class="t" style="display:block">${catIcon(c)} ${d.title}</span>
         <span class="m" style="display:block">${meta || c.label}${needsMe ? html` · <span class="rose">Zusage offen</span>` : ''}</span>
       </span>
       ${rsvpDots(ev)}
@@ -49,11 +49,11 @@ export function eventRow({ ev, occ }, { showDate = false } = {}) {
 }
 
 function specialRow(s) {
-  return html`<div class="event-row readonly"><span class="bar" style="background:var(--purple)"></span><span class="time">ganzer<small>Tag</small></span><span class="body"><span class="t" style="display:block">${s.emoji} ${s.title}</span><span class="m" style="display:block">Jährlich</span></span></div>`;
+  return html`<div class="event-row readonly"><span class="bar" style="background:var(--purple)"></span><span class="time">ganzer<small>Tag</small></span><span class="body"><span class="t" style="display:block">${s.icon ? catIcon({ icon: s.icon, color: 'var(--purple)' }) : s.emoji} ${s.title}</span><span class="m" style="display:block">Jährlich</span></span></div>`;
 }
 
 function entryRow(e) {
-  return html`<a class="event-row readonly card-link" href="#/entry/${e.id}"><span class="bar" style="background:var(--text3)"></span><span class="time">erlebt</span><span class="body"><span class="t" style="display:block">✨ ${e.data.title}</span><span class="m" style="display:block">Erinnerung ansehen</span></span></a>`;
+  return html`<a class="event-row readonly card-link" href="#/entry/${e.id}"><span class="bar" style="background:var(--text3)"></span><span class="time">erlebt</span><span class="body"><span class="t" style="display:block">${catIcon(catOf(e))} ${e.data.title}</span><span class="m" style="display:block">Erinnerung ansehen</span></span></a>`;
 }
 
 function monthView() {
@@ -114,7 +114,7 @@ function monthView() {
       ${dayOccs.map((o) => eventRow(o))}
       ${dayEntries.map(entryRow)}
       ${!dayOccs.length && !daySpecials.length && !dayEntries.length ? html`
-        <button class="event-row readonly" data-act="add" style="justify-content:center;color:var(--accent);font-weight:600">${icon('calendarPlus')}&nbsp;Termin am ${fmtDate(sel, { day: 'numeric', month: 'long' })} planen</button>` : ''}
+        <button class="event-row readonly" data-act="add" style="justify-content:center;color:var(--accent-ink);font-weight:600">${icon('calendarPlus')}&nbsp;Termin am ${fmtDate(sel, { day: 'numeric', month: 'long' })} planen</button>` : ''}
     </div>
 
     ${next.length ? html`
@@ -136,7 +136,7 @@ function listView() {
   const keys = [...groups.keys()].sort();
   return html`
     <button class="btn small block" data-act="past" style="margin-bottom:6px">${state.showPast ? 'Vergangene ausblenden' : 'Vergangene Termine anzeigen'}</button>
-    ${!occs.length ? html`<div class="empty"><span class="em">📅</span><h3>Noch nichts geplant</h3><p>Plant euer nächstes Date, einen Ausflug oder einfach einen gemütlichen Abend.</p><button class="btn primary" data-act="add">${icon('plus')} Termin planen</button></div>` : ''}
+    ${!occs.length ? html`<div class="empty"><span class="em-ico">${icon('calendar')}</span><h3>Noch nichts geplant</h3><p>Plant euer nächstes Date, einen Ausflug oder einfach einen gemütlichen Abend.</p><button class="btn primary" data-act="add">${icon('plus')} Termin planen</button></div>` : ''}
     ${keys.map((k) => {
       const g = groups.get(k);
       if (!g.events.length && !occs.length) return '';
@@ -149,7 +149,7 @@ function listView() {
 function paint(el) {
   const pending = expandEvents(today(), isoDate(addDays(new Date(), 365))).filter((o) => !o.ev.data.rsvp?.[me()] && o.ev.createdBy !== me());
   el.innerHTML = String(html`
-    ${topbar({ title: 'Kalender', right: html`<button class="icon-btn" data-act="add" aria-label="Termin hinzufügen">${icon('plus')}</button>` })}
+    ${topbar({ title: 'Kalender', right: html`<button class="icon-btn" data-act="plan-date" aria-label="Date planen">${icon('glass')}</button><button class="icon-btn" data-act="add" aria-label="Termin hinzufügen">${icon('plus')}</button>` })}
     <div class="page">
       <h1 class="large-title">Kalender</h1>
       <p class="page-sub">${pending.length ? html`<span class="rose">${pending.length === 1 ? `1 Termin von ${nameOf(partner())} wartet auf deine Zusage` : `${pending.length} Termine warten auf deine Zusage`}</span>` : 'Gemeinsame Pläne, Dates und Termine.'}</p>
@@ -190,7 +190,7 @@ export function render(el, _p, query) {
     paint(el);
   };
 
-  const onClick = (e) => {
+  const onClick = async (e) => {
     const t = e.target.closest('[data-act], [data-day], [data-mode]');
     if (!t) return;
     if (t.dataset.mode) { state.mode = t.dataset.mode; paint(el); document.getElementById('scroller').scrollTo({ top: 0 }); return; }
@@ -206,6 +206,7 @@ export function render(el, _p, query) {
       case 'next': changeMonth(1); break;
       case 'today': state.sel = today(); state.month = firstOfMonth(new Date()); paint(el); break;
       case 'add': addEvent(); break;
+      case 'plan-date': { const { openDatePlanner } = await import('./dateplanner.js'); openDatePlanner(); break; }
       case 'past': state.showPast = !state.showPast; paint(el); break;
     }
   };

@@ -207,16 +207,28 @@ export async function syncNow({ silent = false } = {}) {
       await metaDB.set('lastSync', status.lastSync);
       const interesting = fromPartner.filter((r) => ['entry', 'milestone', 'letter', 'wish', 'event'].includes(r.type));
       const photos = fromPartner.filter((r) => r.type === 'photo').length;
-      if (!silent && (interesting.length || photos)) {
+      if (!silent && fromPartner.some((r) => r.type === 'votes')) import('./views/match.js').then((m) => m.notifyNewMatches()).catch(() => {});
+      // Listen: neue Aufgaben für mich und neue Einkaufs-Punkte des Partners (jeweils nur einmal melden)
+      const seen = new Set(getDevice().seenTodos || []);
+      const todoRows = fromPartner.filter((r) => r.type === 'todo' && !r.deleted && !r.data?.done && !seen.has(r.id));
+      const assigned = todoRows.filter((r) => (r.data?.list || 'todo') === 'todo' && r.data?.assignee === me());
+      const shopNew = todoRows.filter((r) => r.data?.list === 'shop' && r.created_by !== me());
+      const wishNew = fromPartner.filter((r) => r.type === 'giftwish' && !r.deleted && r.data?.owner === partner() && !seen.has(r.id));
+      if (wishNew.length) await setDevice({ seenTodos: [...(getDevice().seenTodos || []), ...wishNew.map((r) => r.id)].slice(-400) });
+      if (todoRows.length) await setDevice({ seenTodos: [...seen, ...todoRows.map((r) => r.id)].slice(-400) });
+      if (!silent && (interesting.length || photos || assigned.length || shopNew.length || wishNew.length)) {
         const { toast } = await import('./ui/sheet.js');
         const letter = interesting.find((r) => r.type === 'letter' && r.data?.to === me());
         const who = nameOf(partner());
         const event = interesting.find((r) => r.type === 'event');
-        if (letter) toast(`${who} hat dir einen Liebesbrief geschrieben`, { emoji: '💌', duration: 4000 });
-        else if (event && event.created_by === me()) toast(`${who} hat auf „${event.data?.title || 'deinen Termin'}“ geantwortet`, { emoji: '📅', duration: 4000 });
-        else if (event) toast(`${who} hat einen Termin eingetragen: ${event.data?.title || ''}`, { emoji: '📅', duration: 4000 });
-        else if (interesting.length) toast(`${who} hat etwas Neues hinzugefügt ♡`, { emoji: '✨', duration: 3500 });
-        else toast(`${who} hat ${photos === 1 ? 'ein Foto' : `${photos} Fotos`} hinzugefügt`, { emoji: '📸', duration: 3500 });
+        if (letter) toast(`Neuer Brief von ${who}`, { icon: 'letter', duration: 4000 });
+        else if (event && event.created_by === me()) toast(`${who} hat auf „${event.data?.title || 'deinen Termin'}“ geantwortet`, { icon: 'calendar', duration: 4000 });
+        else if (event) toast(`${who} hat einen Termin eingetragen: ${event.data?.title || ''}`, { icon: 'calendar', duration: 4000 });
+        else if (assigned.length) toast(assigned.length === 1 ? `${who} hat dir „${assigned[0].data?.text || 'eine Aufgabe'}“ zugewiesen` : `${who} hat dir ${assigned.length} Aufgaben zugewiesen`, { icon: 'todo', duration: 4500 });
+        else if (wishNew.length) toast(`Neu auf ${who}s Wunschzettel: ${wishNew[0].data?.title || ''}${wishNew.length > 1 ? ` und ${wishNew.length - 1} mehr` : ''}`, { icon: 'gift', duration: 4000 });
+        else if (shopNew.length) toast(`${who} hat ${shopNew.length === 1 ? `„${shopNew[0].data?.text}“` : `${shopNew.length} Sachen`} auf die Einkaufsliste gesetzt`, { icon: 'cart', duration: 4000 });
+        else if (interesting.length) toast(`${who} hat etwas Neues eingetragen`, { icon: 'sparkles', duration: 3500 });
+        else toast(`${who} hat ${photos === 1 ? 'ein Foto' : `${photos} Fotos`} hinzugefügt`, { icon: 'camera', duration: 3500 });
       }
     } catch (e) {
       console.warn('Sync-Fehler', e);

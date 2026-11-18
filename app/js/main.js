@@ -21,6 +21,13 @@ const views = {
   letters: () => import('./views/letters.js'),
   stats: () => import('./views/stats.js'),
   settings: () => import('./views/settings.js'),
+  ideas: () => import('./views/dateideas.js'),
+  lists: () => import('./views/lists.js'),
+  wishlist: () => import('./views/wishlist.js'),
+  duel: () => import('./views/duel.js'),
+  awards: () => import('./views/awards.js'),
+  match: () => import('./views/match.js'),
+  wrapped: () => import('./views/wrapped.js'),
 };
 
 route('/', views.home, { tab: 'home', root: true });
@@ -35,9 +42,16 @@ route('/bucket', views.bucket, { tab: 'home' });
 route('/letters', views.letters, { tab: 'home' });
 route('/stats', views.stats, { tab: 'home', fab: false });
 route('/settings', views.settings, { tab: 'home', fab: false });
+route('/ideas', views.ideas, { tab: 'home', fab: false });
+route('/lists', views.lists, { tab: 'home', fab: false });
+route('/wishlist', views.wishlist, { tab: 'home', fab: false });
+route('/duel', views.duel, { tab: 'home', fab: false });
+route('/achievements', views.awards, { tab: 'home', fab: false });
+route('/match', views.match, { tab: 'home', fab: false });
+route('/wrapped', views.wrapped, { tab: 'home', fab: false });
 
 const TAB_DEF = [
-  { tab: 'home', path: '/', label: 'Wir', icon: 'heart' },
+  { tab: 'home', path: '/', label: 'Wir', icon: 'home' },
   { tab: 'calendar', path: '/calendar', label: 'Kalender', icon: 'calendar' },
   { tab: 'timeline', path: '/timeline', label: 'Timeline', icon: 'timeline' },
   { tab: 'entries', path: '/entries', label: 'Erlebnisse', icon: 'sparkles' },
@@ -90,14 +104,16 @@ export function photoInput() {
 
 export async function openAddMenu() {
   const items = [
-    { label: 'Termin', emoji: '📅', value: 'event' },
-    ...Object.values(CATEGORIES).map((c) => ({ label: c.label, emoji: c.emoji, value: `entry:${c.key}` })),
-    { label: 'Meilenstein', emoji: '💞', value: 'milestone' },
-    { label: 'Fotos', emoji: '📸', value: 'photos', onSelect: () => photoInput().click() },
-    { label: 'Wunsch', emoji: '🌠', value: 'wish' },
-    { label: 'Liebesbrief', emoji: '💌', value: 'letter' },
+    { label: 'Termin', icon: 'calendar', color: 'var(--accent-ink)', value: 'event' },
+    ...Object.values(CATEGORIES).map((c) => ({ label: c.label, icon: c.icon, color: c.color, value: `entry:${c.key}` })),
+    { label: 'Meilenstein', icon: 'flag', color: 'var(--c-milestone)', value: 'milestone' },
+    { label: 'Fotos', icon: 'camera', color: 'var(--blue)', value: 'photos', onSelect: () => photoInput().click() },
+    { label: 'Wunsch', icon: 'star', color: 'var(--accent2)', value: 'wish' },
+    { label: 'Brief', icon: 'letter', color: 'var(--purple)', value: 'letter' },
+    { label: 'Aufgabe', icon: 'todo', color: 'var(--c-trip)', value: 'todo' },
+    { label: 'Date-Idee', icon: 'dice', color: 'var(--accent2)', value: 'idea' },
   ];
-  const v = await actionSheet({ title: 'Neue Erinnerung', items, layout: 'grid' });
+  const v = await actionSheet({ title: 'Neu', items, layout: 'grid' });
   if (!v) return;
   if (v === 'event') {
     const { openEventForm } = await import('./views/event-form.js');
@@ -114,6 +130,11 @@ export async function openAddMenu() {
   } else if (v === 'letter') {
     const { openLetterForm } = await import('./views/letters.js');
     openLetterForm();
+  } else if (v === 'todo') {
+    go('/lists');
+    setTimeout(() => document.getElementById('nt')?.focus(), 450);
+  } else if (v === 'idea') {
+    go('/ideas');
   }
 }
 
@@ -122,7 +143,7 @@ function registerSW() {
   navigator.serviceWorker.register('./sw.js').then((reg) => {
     const promptUpdate = (worker) => {
       toast('Neue Version verfügbar', {
-        emoji: '✨',
+        icon: 'sparkles',
         actionLabel: 'Aktualisieren',
         duration: 0,
         onAction: () => worker.postMessage('skipWaiting'),
@@ -150,7 +171,7 @@ async function boot() {
   try {
     await loadStore();
   } catch (e) {
-    document.getElementById('view').innerHTML = '<div class="empty"><span class="em">😢</span><h3>Speicher nicht verfügbar</h3><p>Bitte öffne die App nicht im privaten Modus.</p></div>';
+    document.getElementById('view').innerHTML = `<div class="empty"><span class="em-ico">${icon('info')}</span><h3>Speicher nicht verfügbar</h3><p>Bitte öffne die App nicht im privaten Modus.</p></div>`;
     return;
   }
   applyTheme();

@@ -34,7 +34,7 @@ async function icon(size, file, { maskable = false } = {}) {
   // Maskierbare Icons: Motiv in die sichere Zone (80 %) verkleinern, Hintergrund randlos
   const inner = maskable ? 0.8 : 1;
   const off = (size * (1 - inner)) / 2;
-  const html = `<html><body style="margin:0;overflow:hidden;background:#e62e5c">
+  const html = `<html><body style="margin:0;overflow:hidden;background:#3634A3">
     <img src="${svgData}" style="position:absolute;left:0;top:0;width:${size}px;height:${size}px;display:block">
     ${maskable ? `<img src="${svgData}" style="position:absolute;left:${off}px;top:${off}px;width:${size * inner}px;height:${size * inner}px;display:block">` : ''}
   </body></html>`;
@@ -47,10 +47,11 @@ mkdirSync(`${root}/assets/splash`, { recursive: true });
 await icon(180, `${root}/assets/icons/apple-touch-icon.png`);
 await icon(192, `${root}/assets/icons/icon-192.png`);
 await icon(512, `${root}/assets/icons/icon-512.png`);
-await icon(512, `${root}/assets/icons/maskable-512.png`, { maskable: true });
+// Das Motiv liegt bereits in der sicheren Zone – maskierbar = randlos wie das normale Icon
+await icon(512, `${root}/assets/icons/maskable-512.png`);
 
 const links = [];
-const SCHEMES = { light: '#f2f2f7', dark: '#0b0b0e' };
+const SCHEMES = { light: '#F2F2F7', dark: '#000000' };
 for (const [w, h, dpr] of DEVICES) {
   for (const [scheme, bg] of Object.entries(SCHEMES)) {
     const pw = w * dpr, ph = h * dpr;

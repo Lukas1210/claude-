@@ -86,7 +86,8 @@ export async function refresh() {
   if (current.cleanup) { try { current.cleanup(); } catch (e) { console.error(e); } }
   const state = current;
   viewEl.innerHTML = '';
-  const result = await state.mod.render(viewEl, state.params, state.query);
+  // refresh: true → Ansicht soll Filter aus der Adresse nicht erneut übernehmen (der Nutzer hat evtl. umgeschaltet)
+  const result = await state.mod.render(viewEl, state.params, state.query, { refresh: true });
   if (current !== state) return;
   state.cleanup = typeof result === 'function' ? result : null;
   hydrate(viewEl);

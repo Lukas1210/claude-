@@ -3,19 +3,20 @@ import { all, settings, nameOf } from './store.js';
 import { parseDate, isoDate, daysBetween, fmtDate, today } from './model.js';
 
 export const EVENT_CATEGORIES = [
-  { key: 'date', label: 'Date', emoji: '🌹', color: '#ff375f' },
-  { key: 'meet', label: 'Treffen', emoji: '🤝', color: '#0a84ff' },
-  { key: 'food', label: 'Essen', emoji: '🍝', color: '#ff9f0a' },
-  { key: 'cook', label: 'Kochen', emoji: '👩‍🍳', color: '#ff6b35' },
-  { key: 'activity', label: 'Aktivität', emoji: '🎡', color: '#30d158' },
-  { key: 'trip', label: 'Reise', emoji: '✈️', color: '#40c8e0' },
-  { key: 'people', label: 'Familie & Freunde', emoji: '👨‍👩‍👧', color: '#bf5af2' },
-  { key: 'other', label: 'Sonstiges', emoji: '📌', color: '#8e8e93' },
+  { key: 'date', label: 'Date', emoji: '🍸', icon: 'glass', color: 'var(--c-date)' },
+  { key: 'meet', label: 'Treffen', emoji: '📍', icon: 'pin', color: 'var(--blue)' },
+  { key: 'food', label: 'Essen', emoji: '🍽️', icon: 'fork', color: 'var(--c-food)' },
+  { key: 'cook', label: 'Kochen', emoji: '🍳', icon: 'chef', color: 'var(--c-recipe)' },
+  { key: 'activity', label: 'Aktivität', emoji: '🎟️', icon: 'ticket', color: 'var(--c-activity)' },
+  { key: 'trip', label: 'Reise', emoji: '✈️', icon: 'plane', color: 'var(--c-trip)' },
+  { key: 'movie', label: 'Film/Serie', emoji: '🎬', icon: 'film', color: 'var(--c-movie)' },
+  { key: 'people', label: 'Familie & Freunde', emoji: '👥', icon: 'people', color: 'var(--purple)' },
+  { key: 'other', label: 'Sonstiges', emoji: '🏷️', icon: 'tag', color: '#8e8e93' },
 ];
 export const eventCat = (key) => EVENT_CATEGORIES.find((c) => c.key === key) || EVENT_CATEGORIES[EVENT_CATEGORIES.length - 1];
 
 /** Passende Erlebnis-Kategorie, wenn ein Termin als Erinnerung festgehalten wird. */
-export const ENTRY_CATEGORY_FOR = { date: 'date', meet: 'activity', food: 'food', cook: 'recipe', activity: 'activity', trip: 'trip', people: 'activity', other: 'activity' };
+export const ENTRY_CATEGORY_FOR = { date: 'date', meet: 'activity', food: 'food', cook: 'recipe', activity: 'activity', trip: 'trip', movie: 'movie', people: 'activity', other: 'activity' };
 
 export const REPEATS = [
   { key: 'none', label: 'Nie' },
@@ -193,19 +194,19 @@ export function specialDays(from, to) {
   const s = settings();
   const out = [];
   const fromD = parseDate(from), toD = parseDate(to);
-  const add = (dateStr, emoji, title, yearly = true) => {
+  const add = (dateStr, emoji, title, yearly = true, icon = null) => {
     if (!dateStr) return;
-    if (!yearly) { if (dateStr >= from && dateStr <= to) out.push({ date: dateStr, emoji, title }); return; }
+    if (!yearly) { if (dateStr >= from && dateStr <= to) out.push({ date: dateStr, emoji, icon, title }); return; }
     const base = parseDate(dateStr);
     for (let y = fromD.getFullYear(); y <= toD.getFullYear(); y++) {
       const d = new Date(y, base.getMonth(), base.getDate());
       if (d.getMonth() !== base.getMonth() || d < fromD || d > toD || y < base.getFullYear()) continue;
       const n = y - base.getFullYear();
-      out.push({ date: isoDate(d), emoji, title: typeof title === 'function' ? title(n) : title });
+      out.push({ date: isoDate(d), emoji, icon, title: typeof title === 'function' ? title(n) : title });
     }
   };
-  if (s.startDate) add(s.startDate, '💞', (n) => (n === 0 ? 'Unser Tag' : `${n}. Jahrestag`));
-  for (const slot of ['a', 'b']) if (s.birthdays?.[slot]) add(s.birthdays[slot], '🎂', `Geburtstag ${nameOf(slot)}`);
+  if (s.startDate) add(s.startDate, '🗓️', (n) => (n === 0 ? 'Tag 1' : `${n}. Jahrestag`), true, 'ring');
+  for (const slot of ['a', 'b']) if (s.birthdays?.[slot]) add(s.birthdays[slot], '🎂', `Geburtstag ${nameOf(slot)}`, true, 'cake');
   for (const a of s.anniversaries || []) add(a.date, a.emoji || '📅', a.title);
   return out.filter((x) => x.date >= from && x.date <= to).sort((a, b) => a.date.localeCompare(b.date));
 }

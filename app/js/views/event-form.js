@@ -7,6 +7,7 @@ import { get, save, remove, uuid, me } from '../store.js';
 import { today, parseDate, isoDate } from '../model.js';
 import { EVENT_CATEGORIES, REPEATS, REMINDERS, RSVP } from '../events.js';
 import { flag } from '../geo.js';
+import { catIcon } from '../ui/components.js';
 import { go, currentRoute, back } from '../router.js';
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -69,7 +70,7 @@ export function openEventForm({ id = null, date = null, prefill = {} } = {}) {
       <div class="form">
         <input class="title-input" id="et" placeholder="Was habt ihr vor?" value="${st.title}" maxlength="120" enterkeyhint="done">
 
-        <div class="opt-row">${EVENT_CATEGORIES.map((c) => html`<button type="button" class="opt ${st.category === c.key ? 'active' : ''}" data-cat="${c.key}" style="${st.category === c.key ? `background:${c.color};color:#fff` : ''}">${c.emoji} ${c.label}</button>`)}</div>
+        <div class="opt-row">${EVENT_CATEGORIES.map((c) => html`<button type="button" class="opt ${st.category === c.key ? 'active' : ''}" data-cat="${c.key}">${catIcon(c)} ${c.label}</button>`)}</div>
 
         <div>
           <div class="group">

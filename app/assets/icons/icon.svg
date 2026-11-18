@@ -1,13 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Couple Journal: weißes „&“ (Space Grotesk) auf Indigo -->
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ff5f86"/>
-      <stop offset="1" stop-color="#e62e5c"/>
+      <stop offset="0" stop-color="#7472F0"/>
+      <stop offset=".55" stop-color="#5856D6"/>
+      <stop offset="1" stop-color="#36349F"/>
     </linearGradient>
-    <path id="heart" d="M12 21.2c-.2 0-.4-.1-.6-.2C10.9 20.7 3 15.8 1.1 10.8.4 8.9.6 6.9 1.7 5.4 2.8 3.9 4.6 3 6.6 3c2.2 0 4 1 5.4 2.6C13.4 4 15.2 3 17.4 3c2 0 3.8.9 4.9 2.4 1.1 1.5 1.3 3.5.6 5.4-1.9 5-9.8 9.9-10.3 10.2-.2.1-.4.2-.6.2z"/>
+    <radialGradient id="glow" cx="0.22" cy="0.12" r="0.7">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".28"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ink" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E9E8FF"/>
+      <stop offset="1" stop-color="#FFFFFF"/>
+    </linearGradient>
   </defs>
   <rect width="512" height="512" fill="url(#bg)"/>
-  <!-- zwei ineinander verschlungene Herzen -->
-  <use href="#heart" transform="translate(98 132) scale(10.4)" fill="none" stroke="#fff" stroke-width="1.9" stroke-linejoin="round"/>
-  <use href="#heart" transform="translate(190 176) scale(9)" fill="#fff" fill-opacity=".92"/>
+  <rect width="512" height="512" fill="url(#glow)"/>
+  <path transform="translate(126.36 412.00) scale(0.42857 -0.42857)" fill="url(#ink)" d="M235 0Q173 0 126.5 22.5Q80 45 54.0 87.5Q28 130 28 189Q28 232 43.5 264.0Q59 296 86.0 317.0Q113 338 146 348V362Q96 377 64.0 414.0Q32 451 32 512Q32 573 59.0 615.0Q86 657 132.5 678.5Q179 700 239 700H348V596H262Q217 596 187.5 572.0Q158 548 158 501Q158 468 172.5 447.0Q187 426 210.5 416.0Q234 406 262 406H359V496H485V406H577V302H485V0ZM258 104H359V302H258Q214 302 184.0 277.0Q154 252 154 203Q154 153 185.5 128.5Q217 104 258 104Z"/>
 </svg>

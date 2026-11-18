@@ -3,7 +3,7 @@ import { html } from '../ui/dom.js';
 import { icon } from '../ui/icons.js';
 import { all, nameOf } from '../store.js';
 import { CATEGORIES, avgRating, sortByDateDesc, fmtRating, ratingValue } from '../model.js';
-import { entryCard, emptyState, topbar } from '../ui/components.js';
+import { entryCard, emptyState, topbar, catIcon } from '../ui/components.js';
 import { openEntryForm } from './entry-form.js';
 import { afterPaint } from '../router.js';
 
@@ -38,17 +38,35 @@ function paint(el) {
     const again = entries.filter((e) => e.data.category === 'recipe' && e.data.extra?.again === 'yes').length;
     giftStats = html`
       <div class="row" style="gap:10px;margin-bottom:14px">
-        <a class="card card-link grow" href="#/bucket" style="padding:12px 14px">
-          <div style="font-size:20px">🌠</div>
+        <a class="card card-link grow" href="#/bucket?cat=recipe" style="padding:12px 14px">
+          <div class="cat-badge" style="--c:var(--accent2)">${icon('star')}</div>
           <div style="font-weight:600;margin-top:4px">${wishes.length} ${wishes.length === 1 ? 'Rezept' : 'Rezepte'}</div>
           <div class="muted" style="font-size:13px">wollen wir noch kochen</div>
         </a>
         <div class="card grow" style="padding:12px 14px">
-          <div style="font-size:20px">🔁</div>
+          <div class="cat-badge" style="--c:var(--c-activity)">${icon('repeat')}</div>
           <div style="font-weight:600;margin-top:4px">${again} ${again === 1 ? 'Rezept' : 'Rezepte'}</div>
           <div class="muted" style="font-size:13px">kochen wir wieder</div>
         </div>
       </div>`;
+  }
+  if (state.cat === 'movie') {
+    const watch = all('wish').filter((w) => w.data.category === 'movie' && !w.data.done);
+    const rec = entries.filter((e) => e.data.category === 'movie' && e.data.extra?.again === 'yes').length;
+    giftStats = html`
+      <div class="row" style="gap:10px;margin-bottom:10px">
+        <a class="card card-link grow" href="#/bucket?cat=movie" style="padding:12px 14px">
+          <div class="cat-badge" style="--c:var(--c-movie)">${icon('bookmark')}</div>
+          <div style="font-weight:600;margin-top:4px">${watch.length} auf der Watchlist</div>
+          <div class="muted" style="font-size:13px">wollt ihr noch schauen</div>
+        </a>
+        <div class="card grow" style="padding:12px 14px">
+          <div class="cat-badge" style="--c:var(--accent2)">${icon('star')}</div>
+          <div style="font-weight:600;margin-top:4px">${rec} empfehlenswert</div>
+          <div class="muted" style="font-size:13px">würdet ihr weitersagen</div>
+        </div>
+      </div>
+      ${watch.length ? html`<button class="btn primary block" data-act="watch-pick" style="margin-bottom:14px">${icon('dice')} Was schauen wir heute?</button>` : ''}`;
   }
   if (state.cat === 'gift') {
     const gifts = entries.filter((e) => e.data.category === 'gift');
@@ -59,11 +77,12 @@ function paint(el) {
       return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
     };
     giftStats = html`
+      <a class="notice card-link" href="#/wishlist" style="margin:0 0 12px"><span class="cat-badge" style="--c:var(--c-gift)">${icon('gift')}</span><span class="grow">Wunschzettel & geheime Ideen</span><span class="faint">${icon('chevron')}</span></a>
       <div class="card" style="margin-bottom:14px">
         <div class="versus">
-          <div><b>${from('a').length}</b><span class="muted" style="font-size:13px">von ${nameOf('a')}</span>${recvAvg('a') != null ? html`<div class="faint" style="font-size:12px">Ø ${fmtRating(recvAvg('a'))} ♥</div>` : ''}</div>
+          <div><b>${from('a').length}</b><span class="muted" style="font-size:13px">von ${nameOf('a')}</span>${recvAvg('a') != null ? html`<div class="faint" style="font-size:12px">Ø ${fmtRating(recvAvg('a'))} Herzen</div>` : ''}</div>
           <div class="vs">vs.</div>
-          <div><b>${from('b').length}</b><span class="muted" style="font-size:13px">von ${nameOf('b')}</span>${recvAvg('b') != null ? html`<div class="faint" style="font-size:12px">Ø ${fmtRating(recvAvg('b'))} ♥</div>` : ''}</div>
+          <div><b>${from('b').length}</b><span class="muted" style="font-size:13px">von ${nameOf('b')}</span>${recvAvg('b') != null ? html`<div class="faint" style="font-size:12px">Ø ${fmtRating(recvAvg('b'))} Herzen</div>` : ''}</div>
         </div>
       </div>
       <div class="seg" style="margin-bottom:14px">
@@ -77,15 +96,15 @@ function paint(el) {
     ${topbar({ title: 'Erlebnisse', right: html`<button class="icon-btn" data-act="sort" aria-label="Sortieren">${icon('sort')}</button>` })}
     <div class="page">
       <h1 class="large-title">Erlebnisse</h1>
-      <p class="page-sub">${entries.length ? `${entries.length} gemeinsame Erinnerungen${avg != null && state.cat === 'all' ? ` · Ø ${fmtRating(avg)} ♥` : ''}` : 'Alles, was ihr zusammen erlebt habt'}</p>
+      <p class="page-sub">${entries.length ? `${entries.length} Einträge${avg != null && state.cat === 'all' ? ` · Ø ${fmtRating(avg)} Herzen` : ''}` : 'Alles, was ihr zusammen erlebt habt'}</p>
 
       <div class="group" style="margin-bottom:14px">
         <div class="cell" style="min-height:44px">${icon('search')}<input id="q" type="search" placeholder="Suchen …" value="${state.q}" autocomplete="off"></div>
       </div>
 
       <div class="chips" style="margin-bottom:16px">
-        <button class="chip ${state.cat === 'all' ? 'active' : ''}" data-cat="all">✨ Alle <span class="count">${entries.length}</span></button>
-        ${Object.values(CATEGORIES).map((c) => html`<button class="chip ${state.cat === c.key ? 'active' : ''}" data-cat="${c.key}">${c.emoji} ${c.plural} <span class="count">${counts[c.key]}</span></button>`)}
+        <button class="chip ${state.cat === 'all' ? 'active' : ''}" data-cat="all">Alle <span class="count">${entries.length}</span></button>
+        ${Object.values(CATEGORIES).map((c) => html`<button class="chip ${state.cat === c.key ? 'active' : ''}" data-cat="${c.key}">${catIcon(c)} ${c.plural} <span class="count">${counts[c.key]}</span></button>`)}
       </div>
 
       ${giftStats}
@@ -97,14 +116,14 @@ function paint(el) {
 
       <div id="list" class="entry-list">
         ${list.length ? list.map((e, i) => state.sort === 'rating' && i < 3 && avgRating(e) != null
-          ? html`<div style="position:relative">${entryCard(e)}<span style="position:absolute;top:-6px;left:-4px;font-size:20px">${['🥇', '🥈', '🥉'][i]}</span></div>`
+          ? html`<div style="position:relative">${entryCard(e)}<span class="rank-badge">${i + 1}</span></div>`
           : entryCard(e))
           : state.q
-            ? emptyState({ emoji: '🔍', title: 'Nichts gefunden', text: `Keine Erinnerung passt zu „${state.q}“.` })
+            ? emptyState({ icon: 'search', title: 'Nichts gefunden', text: `Nichts passt zu „${state.q}“.` })
             : emptyState({
-              emoji: cat?.emoji || '🌹',
+              icon: cat?.icon || 'sparkles',
               title: cat ? `Noch keine ${cat.plural}` : 'Noch keine Erlebnisse',
-              text: cat ? cat.hint : 'Fangt mit eurem letzten Date oder Lieblingsessen an.',
+              text: cat ? cat.hint : 'Fangt mit eurem letzten Date oder Restaurant an.',
               action: html`<button class="btn primary" data-act="add">${icon('plus')} ${cat ? cat.label : 'Erlebnis'} hinzufügen</button>`,
             })}
       </div>
@@ -117,8 +136,8 @@ function paint(el) {
   if (chips && act) chips.scrollLeft = Math.max(0, act.offsetLeft - chips.clientWidth / 2 + act.clientWidth / 2);
 }
 
-export function render(el, _p, query) {
-  if (query?.cat && (CATEGORIES[query.cat] || query.cat === 'all')) state.cat = query.cat;
+export function render(el, _p, query, opts = {}) {
+  if (!opts.refresh && query?.cat && (CATEGORIES[query.cat] || query.cat === 'all')) state.cat = query.cat;
   paint(el);
   const onClick = async (e) => {
     const t = e.target.closest('[data-cat], [data-act], [data-gf]');
@@ -126,6 +145,7 @@ export function render(el, _p, query) {
     if (t.dataset.cat) { state.cat = t.dataset.cat; persist(); paint(el); return; }
     if (t.dataset.gf) { state.giftFrom = t.dataset.gf; persist(); paint(el); return; }
     if (t.dataset.act === 'add') openEntryForm({ category: state.cat === 'all' ? 'date' : state.cat });
+    if (t.dataset.act === 'watch-pick') { const { surprise } = await import('./bucket.js'); surprise('movie'); }
     if (t.dataset.act === 'sort') {
       state.sort = state.sort === 'date' ? 'rating' : 'date';
       persist();
