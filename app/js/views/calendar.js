@@ -149,7 +149,7 @@ function listView() {
 function paint(el) {
   const pending = expandEvents(today(), isoDate(addDays(new Date(), 365))).filter((o) => !o.ev.data.rsvp?.[me()] && o.ev.createdBy !== me());
   el.innerHTML = String(html`
-    ${topbar({ title: 'Kalender', right: html`<button class="icon-btn" data-act="add" aria-label="Termin hinzufügen">${icon('plus')}</button>` })}
+    ${topbar({ title: 'Kalender', right: html`<button class="icon-btn" data-act="plan-date" aria-label="Date planen">${icon('glass')}</button><button class="icon-btn" data-act="add" aria-label="Termin hinzufügen">${icon('plus')}</button>` })}
     <div class="page">
       <h1 class="large-title">Kalender</h1>
       <p class="page-sub">${pending.length ? html`<span class="rose">${pending.length === 1 ? `1 Termin von ${nameOf(partner())} wartet auf deine Zusage` : `${pending.length} Termine warten auf deine Zusage`}</span>` : 'Gemeinsame Pläne, Dates und Termine.'}</p>
@@ -190,7 +190,7 @@ export function render(el, _p, query) {
     paint(el);
   };
 
-  const onClick = (e) => {
+  const onClick = async (e) => {
     const t = e.target.closest('[data-act], [data-day], [data-mode]');
     if (!t) return;
     if (t.dataset.mode) { state.mode = t.dataset.mode; paint(el); document.getElementById('scroller').scrollTo({ top: 0 }); return; }
@@ -206,6 +206,7 @@ export function render(el, _p, query) {
       case 'next': changeMonth(1); break;
       case 'today': state.sel = today(); state.month = firstOfMonth(new Date()); paint(el); break;
       case 'add': addEvent(); break;
+      case 'plan-date': { const { openDatePlanner } = await import('./dateplanner.js'); openDatePlanner(); break; }
       case 'past': state.showPast = !state.showPast; paint(el); break;
     }
   };

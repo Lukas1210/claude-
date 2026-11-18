@@ -12,6 +12,7 @@ import { getStatus, onStatus, isConfigured, currentUser, login, logout, syncNow,
 import { getBlob } from '../photos.js';
 import { afterPaint, refresh } from '../router.js';
 import { getThemePref, setThemePref, getPalette, setPalette, PALETTES, effectiveTheme } from '../theme.js';
+import { rhythm } from '../dateplan.js';
 
 export const live = true;
 
@@ -214,6 +215,14 @@ export async function render(el) {
         </div>
 
         <div>
+          <div class="group-label">Date-Planer</div>
+          <div class="seg">
+            ${[[7, 'Wöchentlich'], [14, '2 Wochen'], [30, 'Monatlich'], [0, 'Aus']].map(([d, l]) => html`<button class="${rhythm() === d ? 'active' : ''}" data-rhythm="${d}">${l}</button>`)}
+          </div>
+          <div class="group-foot">Die Startseite meldet sich, wenn euer letztes Date länger her ist, und schlägt eine Idee und freie Abende vor. Gilt für euch beide.</div>
+        </div>
+
+        <div>
           <div class="group-label">Darstellung</div>
           <div class="seg">
             ${[['system', 'Automatisch'], ['light', 'Hell'], ['dark', 'Dunkel']].map(([k, l]) => html`<button class="${getThemePref() === k ? 'active' : ''}" data-theme-pref="${k}">${l}</button>`)}
@@ -289,8 +298,12 @@ export async function render(el) {
     }
   };
   const onClick = async (e) => {
-    const t = e.target.closest('[data-act], [data-me], [data-anniv], [data-theme-pref], [data-palette-pick]');
+    const t = e.target.closest('[data-act], [data-me], [data-anniv], [data-theme-pref], [data-palette-pick], [data-rhythm]');
     if (!t) return;
+    if (t.dataset.rhythm != null) {
+      await saveSettings({ dateRhythm: +t.dataset.rhythm });
+      return;
+    }
     if (t.dataset.palettePick) {
       setPalette(t.dataset.palettePick);
       el.querySelectorAll('[data-palette-pick]').forEach((b) => { b.classList.toggle('active', b === t); b.setAttribute('aria-pressed', String(b === t)); });

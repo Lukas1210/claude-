@@ -63,6 +63,7 @@ function recipeHtml(entry) {
             : html`<button class="ing ${st.ing.has(i) ? 'done' : ''}" data-ing="${i}"><span class="ck">${icon('check')}</span><span>${scaleIngredient(ing, factor)}</span></button>`)}
         </div>
         ${factor !== 1 ? html`<p class="group-foot">Umgerechnet von ${base} auf ${servings} Portionen.</p>` : ''}
+        <button class="btn small block" data-act="shop" style="margin-top:10px">${icon('cart')} Auf die Einkaufsliste</button>
       </div>` : ''}
     ${steps.length ? html`
       <div class="section">
@@ -80,6 +81,45 @@ function recipeHtml(entry) {
             : html`<div class="cell"><span class="cell-icon gray">${icon('list')}</span><span class="grow">Quelle</span><span class="value">${x.source}</span></div>`}
         </div>
       </div>` : ''}`;
+}
+
+/** Zutaten auswählen und (umgerechnet) auf die gemeinsame Einkaufsliste setzen. */
+async function openShoppingSheet(entry) {
+  if (!entry) return;
+  const x = entry.data.extra || {};
+  const st = recipeState(entry);
+  const base = parseFloat(String(x.servings || '').replace(',', '.')) || null;
+  const factor = base && st.servings ? st.servings / base : 1;
+  const lines = parseIngredients(x.ingredients).filter((i) => !i.heading).map((i) => scaleIngredient(i, factor));
+  const { addShopping, openTodos, showList } = await import('./lists.js');
+  const already = new Set(openTodos('shop').filter((t) => t.data.recipeId === entry.id).map((t) => t.data.text));
+  const sel = new Set(lines.map((_, i) => i).filter((i) => !already.has(lines[i])));
+  const sheet = openSheet({
+    title: 'Einkaufsliste',
+    left: html`<button class="text-btn" data-act="cancel">Abbrechen</button>`,
+    body: '',
+  });
+  const paint = () => {
+    sheet.body.innerHTML = String(html`
+      <div class="form">
+        <p class="muted" style="margin:0 4px">${entry.data.title}${factor !== 1 ? ` · für ${st.servings} Portionen` : ''}</p>
+        <div class="ing-list">${lines.map((l, i) => html`<button class="ing pick ${sel.has(i) ? 'on' : ''}" data-pick="${i}"><span class="ck">${icon('check')}</span><span>${l}</span>${already.has(l) ? html`<small class="faint" style="margin-left:auto">schon drauf</small>` : ''}</button>`)}</div>
+        <button class="btn primary block" data-act="add-shop" ${sel.size ? '' : 'disabled'}>${icon('cart')} ${sel.size === 1 ? '1 Zutat' : `${sel.size} Zutaten`} hinzufügen</button>
+      </div>`);
+  };
+  paint();
+  sheet.el.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-pick], [data-act]');
+    if (!b) return;
+    if (b.dataset.pick != null) { const i = +b.dataset.pick; sel.has(i) ? sel.delete(i) : sel.add(i); paint(); return; }
+    if (b.dataset.act === 'cancel') sheet.close();
+    if (b.dataset.act === 'add-shop') {
+      const picked = [...sel].sort((a, c) => a - c).map((i) => lines[i]);
+      await addShopping(picked, { recipeId: entry.id, recipeTitle: entry.data.title });
+      sheet.close();
+      toast(`${picked.length === 1 ? '1 Zutat' : `${picked.length} Zutaten`} auf der Einkaufsliste`, { icon: 'cart', actionLabel: 'Ansehen', onAction: () => { showList('shop'); go('/lists'); } });
+    }
+  });
 }
 
 export function openRatingSheet(entry, slot) {
@@ -238,6 +278,7 @@ export function render(el, { id }) {
         openEntryForm({ id: entry.id });
         break;
       }
+      case 'shop': openShoppingSheet(get(entry.id)); break;
       case 'rate': openRatingSheet(entry, t.dataset.slot); break;
       case 'more': {
         const v = await actionSheet({

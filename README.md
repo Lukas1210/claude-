@@ -10,6 +10,9 @@ Euer gemeinsames Journal fürs iPhone: Dates, Aktivitäten, Essen, selbst gekoch
 |---|---|
 | **Startseite** | Großer Tage-Zähler, Kacheln mit Ländern, Kilometern, Erlebnissen und Ø-Bewertung, der nächste Termin, Countdowns (Jahrestag, Geburtstage, Valentinstag, Weihnachten, eigene Tage), „Heute vor X Jahren“ und ein Fun Fact aus euren eigenen Daten. |
 | **Kalender** | Treffen planen mit Datum, Uhrzeit (von–bis) oder ganztägig, Ort, Notizen und Kategorie. Monats- und Listenansicht, Geburtstage und Jahrestage stehen automatisch drin. Termine lassen sich **wiederholen**, jeder kann **zusagen, absagen oder „vielleicht“** sagen, und mit einem Tipp landet ein Termin samt **Erinnerung im iPhone-Kalender**. Nach dem Treffen wird daraus ein bewertbares Erlebnis. |
+| **Date-Planer** | Die Startseite meldet sich, wenn euer letztes Date länger her ist als euer Rhythmus (wöchentlich, alle 2 Wochen, monatlich – unter Einstellungen) oder wenn ein Jahrestag oder Geburtstag ansteht. Sie schlägt freie Abende aus eurem Kalender und eine Idee vor; „Planen“ trägt das Date mit einem Tipp in den Kalender ein. |
+| **Zufalls-Date** | Fast 70 Date-Ideen plus eure eigenen (Bucket-Liste, Restaurants mit „Wieder hin“, Rezepte mit „Nochmal kochen“). Filter für Tag, zu Hause/unterwegs, Budget, Dauer und Stimmung; für Heute, Morgen oder das Wochenende wird das **Wetter** berücksichtigt (bei Regen nur Ideen für drinnen). |
+| **Listen** | Gemeinsame To-dos und Einkaufsliste mit **Zuweisung**: „Du kümmerst dich um …“, „Mia kümmert sich um …“ oder „Wer hat Zeit?“. Mit Fälligkeitsdatum, Abhaken auf beiden iPhones gleichzeitig und Hinweis, wenn dir etwas zugewiesen wurde. Zutaten aus einem Rezept landen mit einem Tipp – auf die gewählte Portionszahl umgerechnet – im Einkauf. |
 | **Erlebnisse bewerten** | Dates, Aktivitäten, Essen, Rezepte, Reisen und Geschenke. Jeder vergibt 1–5 Herzen (auch halbe) und einen Kommentar, der Durchschnitt wird automatisch berechnet. Je Kategorie gibt es passende Felder, z. B. „Wieder hin?“ beim Essen. |
 | **Rezepte** | Selbst Gekochtes mit Fotos, Bewertung, Zutaten, Zubereitung, Tipps und Quelle. Zutaten und Schritte lassen sich abhaken und **auf andere Portionen umrechnen**; der **Kochmodus** hält den Bildschirm an. |
 | **Fotos & Galerie** | Mehrere Fotos pro Eintrag; Aufnahmedatum und Ort kommen automatisch aus dem Foto. Die Galerie sortiert nach Monaten, mit Favoriten, Filtern und Vollbild. |
@@ -74,6 +77,7 @@ Damit ihr beide alles auf euren iPhones seht:
   - Im Supabase-Dashboard mit einem Klick auf „Restore“ wieder starten. Es geht nichts verloren.
   - Der kostenlose Speicher (1 GB) reicht für ungefähr 2.500 Fotos.
 - **Backup:** Unter Einstellungen → Backup könnt ihr alles inklusive Fotos als Datei sichern, z. B. in „Dateien“ oder iCloud Drive.
+- **Wetter** für die Date-Ideen kommt von Open-Meteo. Dafür werden nur die Koordinaten eures Zuhauses (oder des aktuellen Standorts, wenn ihr das erlaubt) übertragen.
 - **Zeitkapseln** sind eine Sperre in der App, keine Verschlüsselung.
 - **Termin-Erinnerungen** kommen vom iPhone-Kalender. Dafür im Termin auf „Zum iPhone-Kalender hinzufügen“ tippen. Eigene Push-Mitteilungen der App bräuchten einen Server.
 - **Updates:** Nach einer neuen Version zeigt die App „Neue Version verfügbar“. Ein Tipp darauf genügt.

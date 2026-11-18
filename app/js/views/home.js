@@ -11,6 +11,11 @@ import { openAddMenu } from '../main.js';
 import { upcoming, eventCat, fmtWhen, countdownText, expandEvents } from '../events.js';
 import { shortPlace } from '../geo.js';
 import { travelStats, ratingStats, bestEntry, funFacts } from '../insights.js';
+import { dateNudge, freeSlots, slotLabel } from '../dateplan.js';
+import { pickIdea } from '../ideas.js';
+import { ideaPool, ideaBadge, openDatePlanner } from './dateplanner.js';
+import { myOpenTodos, openTodos } from './lists.js';
+import { refresh } from '../router.js';
 
 const DAY_MILESTONES = (() => {
   const s = new Set([100, 200, 300, 500, 666, 777, 888]);
@@ -21,6 +26,13 @@ const DAY_MILESTONES = (() => {
 
 let countedAt = 0;
 let factIndex = null;
+let nudgeRoll = 0;
+
+// Kleiner, reproduzierbarer Zufall (gleiche Idee pro Tag, bis „Andere Idee“ getippt wird)
+function seeded(seed) {
+  let a = seed >>> 0;
+  return () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
 
 function hashDay(str) {
   let h = 0;
@@ -134,6 +146,18 @@ export function render(el) {
   const partnerName = nameOf(me() === 'a' ? 'b' : 'a');
   const facts = funFacts({ entries, photos: photoCount, startDate: start, home: s.home, names: { a: nameOf('a'), b: nameOf('b') }, today: todayStr });
   if (factIndex == null || factIndex >= facts.length) factIndex = facts.length ? hashDay(todayStr) % facts.length : 0;
+  const snoozed = dev.nudgeSnooze && dev.nudgeSnooze > todayStr;
+  const nudge = snoozed ? null : dateNudge(todayStr);
+  let nudgeIdea = null;
+  let nudgeSlots = [];
+  if (nudge) {
+    nudgeIdea = pickIdea(ideaPool(), nudge.kind === 'occasion' ? { mood: 'besonders' } : {}, { rnd: seeded(hashDay(todayStr) + nudgeRoll * 7919) })?.idea || null;
+    nudgeSlots = freeSlots(todayStr, { days: nudge.kind === 'occasion' ? Math.max(2, nudge.occasion.days) : 14, max: 3 });
+  }
+  const myTodos = myOpenTodos();
+  const dueTodos = myTodos.filter((t) => t.data.due && t.data.due <= todayStr).length;
+  const todoOpen = openTodos('todo').length;
+  const shopOpen = openTodos('shop').length;
 
   el.innerHTML = String(html`
     <div class="page home">
@@ -187,6 +211,24 @@ export function render(el) {
         </a>`;
       })() : ''}
       ${pendingRsvp ? html`<a class="notice card-link" href="#/calendar"><span class="cat-badge" style="--c:var(--accent-ink)">${icon('calendar')}</span><span class="grow">${pendingRsvp === 1 ? `${partnerName} hat einen Termin geplant – deine Zusage fehlt` : `${pendingRsvp} Termine warten auf deine Zusage`}</span><span class="badge">${pendingRsvp}</span></a>` : ''}
+      ${myTodos.length ? html`<a class="notice card-link" href="#/lists"><span class="cat-badge" style="--c:var(--c-trip)">${icon('todo')}</span><span class="grow">${myTodos.length === 1 ? `Für dich: ${myTodos[0].data.text}` : `${myTodos.length} Aufgaben für dich`}${dueTodos ? html` · <b class="rose">${dueTodos} fällig</b>` : ''}</span><span class="badge">${myTodos.length}</span></a>` : ''}
+
+      ${nudge ? html`
+        <div class="nudge" id="nudge">
+          <div class="row between">
+            <span class="kicker">${nudge.kind === 'occasion' ? `${nudge.occasion.what} · ${nudge.occasion.days === 0 ? 'heute' : nudge.occasion.days === 1 ? 'morgen' : `in ${nudge.occasion.days} Tagen`}` : 'Zeit für ein Date'}</span>
+            <button class="later" data-act="nudge-later">Später</button>
+          </div>
+          <div class="nudge-title">${nudge.kind === 'occasion' ? 'Schon etwas geplant?' : nudge.since == null ? 'Plant euer erstes Date' : `Euer letztes Date ist ${nudge.since} ${nudge.since === 1 ? 'Tag' : 'Tage'} her.`}</div>
+          ${nudge.kind === 'rhythm' && nudge.last ? html`<div class="muted" style="font-size:14px;margin-top:3px">Zuletzt: ${nudge.last.title}</div>` : ''}
+          ${nudgeIdea ? html`<div class="nudge-idea">${ideaBadge(nudgeIdea, 'md')}<span class="grow">Idee: <b>${nudgeIdea.title}</b></span></div>` : ''}
+          ${nudgeSlots.length ? html`<div class="chips wrap-chips">${nudgeSlots.map((sl) => html`<button class="chip" data-nudge-slot="${sl.date}">${slotLabel(sl, todayStr)}</button>`)}</div>` : ''}
+          <div class="actions">
+            <button class="btn primary small" data-act="nudge-plan">${icon('calendarPlus')} Planen</button>
+            <button class="btn small" data-act="nudge-roll">${icon('dice')} Andere Idee</button>
+          </div>
+        </div>` : ''}
+
       ${unread ? html`<a class="notice card-link" href="#/letters"><span class="cat-badge" style="--c:var(--purple)">${icon('letter')}</span><span class="grow">${unread === 1 ? `Neuer Brief von ${partnerName}` : `${unread} neue Briefe von ${partnerName}`}</span><span class="badge">${unread}</span></a>` : ''}
 
       <div class="section">
@@ -236,6 +278,8 @@ export function render(el) {
           <span class="faint">${icon('chevron')}</span>
         </a>
         <div class="card-grid">
+          ${tile('#/ideas', 'dice', 'var(--accent2)', 'Date-Ideen', 'Würfeln: Was machen wir?')}
+          ${tile('#/lists', 'todo', 'var(--c-trip)', 'Listen', todoOpen || shopOpen ? `${todoOpen} To-dos · ${shopOpen} Einkauf` : 'To-dos & Einkauf')}
           ${tile('#/bucket', 'star', 'var(--accent2)', 'Bucket-Liste', wishes.length ? `${wishDone} von ${wishes.length} erledigt` : 'Was ihr noch machen wollt')}
           ${tile('#/letters', 'letter', 'var(--purple)', 'Briefe', letters.length ? `${letters.length} ${letters.length === 1 ? 'Brief' : 'Briefe'}` : 'Zeitkapseln & Nachrichten', unread ? html`<span class="badge">${unread}</span>` : '')}
           ${tile('#/stats', 'chart', 'var(--c-trip)', 'Statistik', 'Wer bewertet strenger?')}
@@ -254,10 +298,19 @@ export function render(el) {
   if (Date.now() - countedAt > 60000) { countUpAll(el); countedAt = Date.now(); }
 
   const onClick = async (e) => {
+    const sl = e.target.closest('[data-nudge-slot]');
+    if (sl) { openDatePlanner({ idea: nudgeIdea, slot: nudgeSlots.find((x) => x.date === sl.dataset.nudgeSlot) }); return; }
     const a = e.target.closest('[data-act]');
     if (!a) return;
     if (a.dataset.act === 'dismiss-install') await setDevice({ installHintDismissed: true });
     if (a.dataset.act === 'add') openAddMenu();
+    if (a.dataset.act === 'nudge-later') {
+      const d = parseDate(todayStr); d.setDate(d.getDate() + 3);
+      await setDevice({ nudgeSnooze: isoDate(d) });
+      el.querySelector('#nudge')?.remove();
+    }
+    if (a.dataset.act === 'nudge-roll') { nudgeRoll++; refresh(); }
+    if (a.dataset.act === 'nudge-plan') openDatePlanner({ idea: nudgeIdea, slot: nudgeSlots[0] || null });
     if (a.dataset.act === 'fact' && facts.length > 1) {
       factIndex = (factIndex + 1) % facts.length;
       a.querySelector('.fact-text').textContent = facts[factIndex];

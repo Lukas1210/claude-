@@ -21,6 +21,8 @@ const views = {
   letters: () => import('./views/letters.js'),
   stats: () => import('./views/stats.js'),
   settings: () => import('./views/settings.js'),
+  ideas: () => import('./views/dateideas.js'),
+  lists: () => import('./views/lists.js'),
 };
 
 route('/', views.home, { tab: 'home', root: true });
@@ -35,6 +37,8 @@ route('/bucket', views.bucket, { tab: 'home' });
 route('/letters', views.letters, { tab: 'home' });
 route('/stats', views.stats, { tab: 'home', fab: false });
 route('/settings', views.settings, { tab: 'home', fab: false });
+route('/ideas', views.ideas, { tab: 'home', fab: false });
+route('/lists', views.lists, { tab: 'home', fab: false });
 
 const TAB_DEF = [
   { tab: 'home', path: '/', label: 'Wir', icon: 'home' },
@@ -96,6 +100,8 @@ export async function openAddMenu() {
     { label: 'Fotos', icon: 'camera', color: 'var(--blue)', value: 'photos', onSelect: () => photoInput().click() },
     { label: 'Wunsch', icon: 'star', color: 'var(--accent2)', value: 'wish' },
     { label: 'Brief', icon: 'letter', color: 'var(--purple)', value: 'letter' },
+    { label: 'Aufgabe', icon: 'todo', color: 'var(--c-trip)', value: 'todo' },
+    { label: 'Date-Idee', icon: 'dice', color: 'var(--accent2)', value: 'idea' },
   ];
   const v = await actionSheet({ title: 'Neu', items, layout: 'grid' });
   if (!v) return;
@@ -114,6 +120,11 @@ export async function openAddMenu() {
   } else if (v === 'letter') {
     const { openLetterForm } = await import('./views/letters.js');
     openLetterForm();
+  } else if (v === 'todo') {
+    go('/lists');
+    setTimeout(() => document.getElementById('nt')?.focus(), 450);
+  } else if (v === 'idea') {
+    go('/ideas');
   }
 }
 

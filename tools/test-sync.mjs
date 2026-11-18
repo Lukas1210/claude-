@@ -191,7 +191,27 @@ await B.sync();
 await A.sync();
 check('A sieht Zusage von B', (await A.run(async (id) => (await import('./js/store.js')).get(id).data.rsvp.b, evId)) === 'yes');
 
-// 8) Zweiter Sync ohne Änderungen überträgt nichts
+// 8) Listen: A weist B eine Aufgabe zu; beide haken gleichzeitig verschiedene Einkäufe ab
+const todoIds = await A.run(async () => {
+  const S = await import('./js/store.js');
+  const base = { due: null, done: false, doneAt: null, doneBy: null, note: '' };
+  const t = await S.save('todo', { ...base, text: 'Müll rausbringen', list: 'todo', assignee: 'b' });
+  const m = await S.save('todo', { ...base, text: 'Milch', list: 'shop', assignee: null });
+  const b = await S.save('todo', { ...base, text: 'Brot', list: 'shop', assignee: null });
+  return [t.id, m.id, b.id];
+});
+await A.sync();
+await B.sync();
+check('B erhält zugewiesene Aufgabe', (await B.run(async (id) => { const t = (await import('./js/store.js')).get(id); return t && `${t.data.text}|${t.data.assignee}`; }, todoIds[0])) === 'Müll rausbringen|b');
+await A.run(async (id) => (await import('./js/store.js')).update(id, { done: true, doneBy: 'a' }), todoIds[1]);
+await B.run(async (id) => (await import('./js/store.js')).update(id, { done: true, doneBy: 'b' }), todoIds[2]);
+await A.sync();
+await B.sync();
+await A.sync();
+const doneOn = (dev) => dev.run(async (ids) => { const S = await import('./js/store.js'); return ids.map((id) => S.get(id).data.done).join(','); }, todoIds.slice(1));
+check('Gleichzeitig abgehakt: beide Einkäufe auf beiden Geräten erledigt', (await doneOn(A)) === 'true,true' && (await doneOn(B)) === 'true,true');
+
+// 9) Zweiter Sync ohne Änderungen überträgt nichts
 r = await B.sync();
 check('Leerlauf-Sync überträgt nichts', r.pushed === 0 && r.fromPartner === 0, JSON.stringify(r));
 
