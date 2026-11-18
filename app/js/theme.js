@@ -1,13 +1,13 @@
 // Erscheinungsbild: automatisch (wie das iPhone), hell oder dunkel – plus Farbwelt. Pro Gerät gespeichert.
 const KEY = 'cj-theme';
 const PALETTE_KEY = 'cj-palette';
-export const DEFAULT_PALETTE = 'night';
+export const DEFAULT_PALETTE = 'indigo';
 
 /** Farbwelten: Name, Statusleisten-/Hintergrundfarbe und Vorschau-Farben (hell/dunkel). */
 export const PALETTES = {
+  indigo: { name: 'Indigo', light: { bg: '#F2F2F7', swatch: ['#5856D6', '#E5342A'] }, dark: { bg: '#000000', swatch: ['#24236B', '#8E8CFF'] } },
   night: { name: 'Nachtblau & Gold', light: { bg: '#F2F4F9', swatch: ['#14213D', '#E2A93B'] }, dark: { bg: '#070B17', swatch: ['#0F1A36', '#F0B44C'] } },
   ocean: { name: 'Petrol & Koralle', light: { bg: '#EFF5F4', swatch: ['#0F766E', '#FF7A66'] }, dark: { bg: '#051110', swatch: ['#0A2A27', '#2DD4BF'] } },
-  indigo: { name: 'Indigo', light: { bg: '#F2F2F7', swatch: ['#5856D6', '#E5342A'] }, dark: { bg: '#000000', swatch: ['#24236B', '#8E8CFF'] } },
   polaroid: { name: 'Polaroid', light: { bg: '#F1F1F1', swatch: ['#111111', '#E94B3C'] }, dark: { bg: '#000000', swatch: ['#161616', '#FF5A4D'] } },
   neon: { name: 'Schwarz & Neon', light: { bg: '#F3F3F1', swatch: ['#0B0B0C', '#C6F432'] }, dark: { bg: '#0A0A0B', swatch: ['#0E0E10', '#C6F432'] } },
 };

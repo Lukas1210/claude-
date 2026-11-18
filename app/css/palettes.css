@@ -26,7 +26,7 @@
   --accent-ink: #1F3B8A;
   --primary-bg: #14213D;
   --primary-fg: #FFFFFF;
-  --heart: #B97C16;
+  --heart: #E5342A;
   --chart: #D99A2B;
   --em-color: #0E1526;
   --em-bg: linear-gradient(transparent 60%, rgba(226, 169, 59, 0.55) 60%, rgba(226, 169, 59, 0.55) 92%, transparent 92%);
@@ -57,7 +57,7 @@
   --globe-glow: rgba(226, 169, 59, 0.16);
   --globe-visited: #E2A93B;
   --globe-arc: #14213D;
-  --globe-marker: #C98A1E;
+  --globe-marker: #E5342A;
   --globe-marker-text: #FFFFFF;
   --globe-home: #14213D;
   --env-bg: color-mix(in srgb, #E2A93B 12%, #FFFFFF);
@@ -92,7 +92,7 @@
     --accent-ink: #F0B44C;
     --primary-bg: #F0B44C;
     --primary-fg: #0B1226;
-    --heart: #F0B44C;
+    --heart: #FF453A;
     --chart: #F0B44C;
     --em-color: #F0B44C;
     --em-bg: none;
@@ -123,8 +123,8 @@
     --globe-glow: rgba(240, 180, 76, 0.16);
     --globe-visited: #F0B44C;
     --globe-arc: #F0B44C;
-    --globe-marker: #F0B44C;
-    --globe-marker-text: #0B1226;
+    --globe-marker: #FF453A;
+    --globe-marker-text: #FFFFFF;
     --globe-home: #6EA8FF;
     --env-bg: color-mix(in srgb, #F0B44C 12%, #111829);
     --env-flap: color-mix(in srgb, #F0B44C 22%, #111829);
@@ -158,7 +158,7 @@
   --accent-ink: #F0B44C;
   --primary-bg: #F0B44C;
   --primary-fg: #0B1226;
-  --heart: #F0B44C;
+  --heart: #FF453A;
   --chart: #F0B44C;
   --em-color: #F0B44C;
   --em-bg: none;
@@ -189,8 +189,8 @@
   --globe-glow: rgba(240, 180, 76, 0.16);
   --globe-visited: #F0B44C;
   --globe-arc: #F0B44C;
-  --globe-marker: #F0B44C;
-  --globe-marker-text: #0B1226;
+  --globe-marker: #FF453A;
+  --globe-marker-text: #FFFFFF;
   --globe-home: #6EA8FF;
   --env-bg: color-mix(in srgb, #F0B44C 12%, #111829);
   --env-flap: color-mix(in srgb, #F0B44C 22%, #111829);
@@ -225,7 +225,7 @@
   --accent-ink: #0F766E;
   --primary-bg: #0F766E;
   --primary-fg: #FFFFFF;
-  --heart: #E5523F;
+  --heart: #E5342A;
   --chart: #14B8A6;
   --em-color: #0A1F1D;
   --em-bg: linear-gradient(transparent 60%, rgba(45, 212, 191, 0.5) 60%, rgba(45, 212, 191, 0.5) 92%, transparent 92%);
@@ -256,7 +256,7 @@
   --globe-glow: rgba(20, 184, 166, 0.16);
   --globe-visited: #14B8A6;
   --globe-arc: #0F766E;
-  --globe-marker: #E5523F;
+  --globe-marker: #E5342A;
   --globe-marker-text: #FFFFFF;
   --globe-home: #0F766E;
   --env-bg: color-mix(in srgb, #14B8A6 12%, #FFFFFF);
@@ -291,7 +291,7 @@
     --accent-ink: #2DD4BF;
     --primary-bg: #2DD4BF;
     --primary-fg: #042F2E;
-    --heart: #FF7A66;
+    --heart: #FF453A;
     --chart: #2DD4BF;
     --em-color: #2DD4BF;
     --em-bg: none;
@@ -322,8 +322,8 @@
     --globe-glow: rgba(45, 212, 191, 0.16);
     --globe-visited: #2DD4BF;
     --globe-arc: #2DD4BF;
-    --globe-marker: #FF7A66;
-    --globe-marker-text: #2A0A06;
+    --globe-marker: #FF453A;
+    --globe-marker-text: #FFFFFF;
     --globe-home: #5EEAD4;
     --env-bg: color-mix(in srgb, #2DD4BF 12%, #0D1D1B);
     --env-flap: color-mix(in srgb, #2DD4BF 22%, #0D1D1B);
@@ -357,7 +357,7 @@
   --accent-ink: #2DD4BF;
   --primary-bg: #2DD4BF;
   --primary-fg: #042F2E;
-  --heart: #FF7A66;
+  --heart: #FF453A;
   --chart: #2DD4BF;
   --em-color: #2DD4BF;
   --em-bg: none;
@@ -388,8 +388,8 @@
   --globe-glow: rgba(45, 212, 191, 0.16);
   --globe-visited: #2DD4BF;
   --globe-arc: #2DD4BF;
-  --globe-marker: #FF7A66;
-  --globe-marker-text: #2A0A06;
+  --globe-marker: #FF453A;
+  --globe-marker-text: #FFFFFF;
   --globe-home: #5EEAD4;
   --env-bg: color-mix(in srgb, #2DD4BF 12%, #0D1D1B);
   --env-flap: color-mix(in srgb, #2DD4BF 22%, #0D1D1B);
@@ -623,7 +623,7 @@
   --accent-ink: #111111;
   --primary-bg: #111111;
   --primary-fg: #FFFFFF;
-  --heart: #E2402F;
+  --heart: #E5342A;
   --chart: #2D8CD1;
   --em-color: #111111;
   --em-bg: linear-gradient(90deg, #E94B3C 0 20%, #F7943E 20% 40%, #FCCB3F 40% 60%, #4FB06D 60% 80%, #2D8CD1 80%) bottom / 100% 0.14em no-repeat;
@@ -654,9 +654,9 @@
   --globe-glow: rgba(233, 75, 60, 0.16);
   --globe-visited: #2D8CD1;
   --globe-arc: #111111;
-  --globe-marker: #E2402F;
+  --globe-marker: #E5342A;
   --globe-marker-text: #FFFFFF;
-  --globe-home: #111111;
+  --globe-home: #2D8CD1;
   --env-bg: color-mix(in srgb, #111111 12%, #FFFFFF);
   --env-flap: color-mix(in srgb, #111111 22%, #FFFFFF);
   --env-text: #111111;
@@ -697,7 +697,7 @@
     --accent-ink: #F5F5F5;
     --primary-bg: #F5F5F5;
     --primary-fg: #111111;
-    --heart: #FF5A4D;
+    --heart: #FF453A;
     --chart: #4EA8E8;
     --em-color: #F5F5F5;
     --em-bg: linear-gradient(90deg, #E94B3C 0 20%, #F7943E 20% 40%, #FCCB3F 40% 60%, #4FB06D 60% 80%, #2D8CD1 80%) bottom / 100% 0.14em no-repeat;
@@ -728,9 +728,9 @@
     --globe-glow: rgba(255, 90, 77, 0.16);
     --globe-visited: #4EA8E8;
     --globe-arc: #F5F5F5;
-    --globe-marker: #FF5A4D;
+    --globe-marker: #FF453A;
     --globe-marker-text: #FFFFFF;
-    --globe-home: #F5F5F5;
+    --globe-home: #4EA8E8;
     --env-bg: color-mix(in srgb, #F5F5F5 12%, #161616);
     --env-flap: color-mix(in srgb, #F5F5F5 22%, #161616);
     --env-text: #F5F5F5;
@@ -771,7 +771,7 @@
   --accent-ink: #F5F5F5;
   --primary-bg: #F5F5F5;
   --primary-fg: #111111;
-  --heart: #FF5A4D;
+  --heart: #FF453A;
   --chart: #4EA8E8;
   --em-color: #F5F5F5;
   --em-bg: linear-gradient(90deg, #E94B3C 0 20%, #F7943E 20% 40%, #FCCB3F 40% 60%, #4FB06D 60% 80%, #2D8CD1 80%) bottom / 100% 0.14em no-repeat;
@@ -802,9 +802,9 @@
   --globe-glow: rgba(255, 90, 77, 0.16);
   --globe-visited: #4EA8E8;
   --globe-arc: #F5F5F5;
-  --globe-marker: #FF5A4D;
+  --globe-marker: #FF453A;
   --globe-marker-text: #FFFFFF;
-  --globe-home: #F5F5F5;
+  --globe-home: #4EA8E8;
   --env-bg: color-mix(in srgb, #F5F5F5 12%, #161616);
   --env-flap: color-mix(in srgb, #F5F5F5 22%, #161616);
   --env-text: #F5F5F5;

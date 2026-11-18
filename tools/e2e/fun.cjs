@@ -46,6 +46,7 @@ exports.run = async ({ server, check }) => {
     check('Neues Match vom Partner wird gemeldet', (await p.textContent('#toasts')).includes('Neues Match'));
 
     // ---------- Rückblick ----------
+    await app.calm();
     await go('/', 600);
     await go('/wrapped?y=2025', 1200);
     check('Rückblick startet als Story (2025)', !!(await p.$('.story')) && (await p.textContent('.st-year')).includes('2025'));

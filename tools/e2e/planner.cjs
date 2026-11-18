@@ -50,7 +50,7 @@ exports.run = async ({ server, check }) => {
       await p.click('[data-act="roll"]'); await p.waitForTimeout(750);
     }
     check('Bei Regen keine Draußen-Ideen', indoor);
-    await shot('ideas');
+    await app.scroll(0); await app.calm(); await shot('ideas');
 
     // Merken → Bucket-Liste
     const ideaTitle = (await p.textContent('.idea-title')).trim();
@@ -80,7 +80,7 @@ exports.run = async ({ server, check }) => {
     const nudge = await p.$('#nudge');
     check('Hinweis „Zeit für ein Date“ (20 Tage, Rhythmus 14)', !!nudge && (await nudge.textContent()).includes('20 Tage her'), nudge ? (await nudge.textContent()).replace(/\s+/g, ' ').slice(0, 80) : 'kein Hinweis');
     check('Hinweis schlägt freie Abende vor', (await p.$$('#nudge [data-nudge-slot]')).length >= 1);
-    await shot('home-nudge');
+    await app.calm(); await shot('home-nudge');
     await p.click('#nudge [data-act="nudge-later"]'); await p.waitForTimeout(400);
     check('„Später“ blendet den Hinweis aus', !(await p.$('#nudge')));
     await S(async () => (await import('./js/store.js')).setDevice({ nudgeSnooze: null }));
@@ -130,7 +130,7 @@ exports.run = async ({ server, check }) => {
     check('Tippen aufs Symbol weist Mia zu', (await S(async (id) => (await import('./js/store.js')).get(id).data.assignee, first)) === 'b' && (await p.textContent('#todo-body')).includes('Mia kümmert sich um'));
     await p.click(`[data-check="${first}"]`); await p.waitForTimeout(400);
     check('Abhaken markiert als erledigt', (await S(async (id) => (await import('./js/store.js')).get(id).data.done, first)) === true && (await p.textContent('#todo-body')).includes('Erledigt · 1'));
-    await shot('lists');
+    await app.calm(); await shot('lists');
     await go('/', 800);
     check('Startseite: „Für dich: Geschenk für Oma besorgen“', (await p.textContent('#view')).includes('Für dich: Geschenk für Oma besorgen'));
 

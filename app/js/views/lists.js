@@ -47,7 +47,7 @@ function row(t) {
         <span class="todo-text">${d.text}</span>
         ${sub.length ? html`<span class="todo-sub">${sub.map((x, i) => html`${i ? ' · ' : ''}${x}`)}</span>` : ''}
       </button>
-      <button class="who ${d.assignee == null ? 'both' : d.assignee === me() ? 'me' : 'partner'}" data-assign="${t.id}" aria-label="${assigneeText(d.assignee)} – tippen zum Ändern">${d.assignee == null ? icon('people') : initial(d.assignee)}</button>
+      <button class="assignee ${d.assignee == null ? 'both' : d.assignee === me() ? 'me' : 'partner'}" data-assign="${t.id}" aria-label="${assigneeText(d.assignee)} – tippen zum Ändern">${d.assignee == null ? icon('people') : initial(d.assignee)}</button>
     </div>`;
 }
 
@@ -65,7 +65,7 @@ function counts() {
   };
 }
 
-const whoBtn = (a) => html`<button type="button" id="add-who" data-act="add-who" class="who ${a == null ? 'both' : a === me() ? 'me' : 'partner'}" aria-label="${assigneeText(a)} – tippen zum Ändern">${a == null ? icon('people') : initial(a)}</button>`;
+const whoBtn = (a) => html`<button type="button" id="add-who" data-act="add-who" class="assignee ${a == null ? 'both' : a === me() ? 'me' : 'partner'}" aria-label="${assigneeText(a)} – tippen zum Ändern">${a == null ? icon('people') : initial(a)}</button>`;
 
 function bodyHtml() {
   const isShop = state.list === 'shop';

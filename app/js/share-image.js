@@ -16,7 +16,7 @@ const DISPLAY = '"Space Grotesk", -apple-system, sans-serif';
 function palette() {
   const cs = getComputedStyle(document.documentElement);
   const v = (n, f) => cs.getPropertyValue(n).trim() || f;
-  return { brand: v('--brand', '#F0B44C'), rgb: v('--brand-rgb', '240, 180, 76'), heroBg: v('--hero-bg', '#0F1A36'), num: v('--hero-num', '#F0B44C') };
+  return { brand: v('--brand', '#5856D6'), rgb: v('--brand-rgb', '88, 86, 214'), heroBg: v('--hero-bg', '#3B39B3'), num: v('--hero-num', '#FFFFFF'), heart: v('--heart-hero', '#FF6B6B') };
 }
 
 async function loadImage(src) {
@@ -168,9 +168,9 @@ export async function entryImage(entry) {
     ctx.font = `600 40px ${SANS}`;
     ctx.fillStyle = '#fff';
     ctx.fillText(nameOf(s), PAD, y);
-    drawHearts(ctx, PAD + 230, y - 46, 50, ratingValue(entry, s), pal.brand);
+    drawHearts(ctx, PAD + 230, y - 46, 50, ratingValue(entry, s), pal.heart);
     ctx.font = `700 44px ${DISPLAY}`;
-    ctx.fillStyle = pal.brand;
+    ctx.fillStyle = '#fff';
     ctx.fillText(fmtRating(ratingValue(entry, s)), PAD + 230 + 5 * 60 + 20, y);
   }
   return toBlob(c);

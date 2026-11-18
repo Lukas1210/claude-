@@ -69,7 +69,7 @@ function recipeHtml(entry) {
       <div class="section">
         <div class="section-head"><h2 class="section-title small">Zubereitung</h2>${keepAwakeSupported() ? html`<button class="section-link" data-act="awake">${isKeepingAwake() ? html`${icon('sun')} Bildschirm bleibt an` : 'Kochmodus'}</button>` : ''}</div>
         <div class="steps">
-          ${steps.map((t, i) => html`<button class="step ${st.steps.has(i) ? 'done' : ''}" data-step="${i}"><span class="no">${st.steps.has(i) ? icon('check') : i + 1}</span><span class="tx">${t}</span></button>`)}
+          ${steps.map((t, i) => html`<button class="rstep ${st.steps.has(i) ? 'done' : ''}" data-step="${i}"><span class="no">${st.steps.has(i) ? icon('check') : i + 1}</span><span class="tx">${t}</span></button>`)}
         </div>
       </div>` : ''}
     ${x.tips ? html`<div class="section"><div class="section-head"><h2 class="section-title small">Unsere Tipps</h2></div><div class="card notes">${x.tips}</div></div>` : ''}

@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
   <title>Couple Journal</title>
   <meta name="description" content="Unser gemeinsames Tagebuch – Erlebnisse, Termine, Reisen, Fotos und Erinnerungen.">
-  <meta name="theme-color" content="#F2F4F9" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#070B17" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
   <meta name="color-scheme" content="light dark">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -47,7 +47,7 @@
       var t = localStorage.getItem('cj-theme');
       if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
       // Farbwelt (Standard muss zu DEFAULT_PALETTE in js/theme.js passen)
-      var p = localStorage.getItem('cj-palette') || 'night';
+      var p = localStorage.getItem('cj-palette') || 'indigo';
       if (p !== 'neon') document.documentElement.dataset.palette = p;
     } catch (e) {}
   </script>

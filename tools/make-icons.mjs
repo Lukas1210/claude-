@@ -34,7 +34,7 @@ async function icon(size, file, { maskable = false } = {}) {
   // Maskierbare Icons: Motiv in die sichere Zone (80 %) verkleinern, Hintergrund randlos
   const inner = maskable ? 0.8 : 1;
   const off = (size * (1 - inner)) / 2;
-  const html = `<html><body style="margin:0;overflow:hidden;background:#0F1A36">
+  const html = `<html><body style="margin:0;overflow:hidden;background:#3634A3">
     <img src="${svgData}" style="position:absolute;left:0;top:0;width:${size}px;height:${size}px;display:block">
     ${maskable ? `<img src="${svgData}" style="position:absolute;left:${off}px;top:${off}px;width:${size * inner}px;height:${size * inner}px;display:block">` : ''}
   </body></html>`;
@@ -51,7 +51,7 @@ await icon(512, `${root}/assets/icons/icon-512.png`);
 await icon(512, `${root}/assets/icons/maskable-512.png`);
 
 const links = [];
-const SCHEMES = { light: '#F2F4F9', dark: '#070B17' };
+const SCHEMES = { light: '#F2F2F7', dark: '#000000' };
 for (const [w, h, dpr] of DEVICES) {
   for (const [scheme, bg] of Object.entries(SCHEMES)) {
     const pw = w * dpr, ph = h * dpr;

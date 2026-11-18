@@ -44,13 +44,13 @@ exports.run = async ({ server, check }) => {
     check('Fakten: Zeit, Portionen, Zusammen', txt.includes('20 Min.') && txt.includes('2 Port.') && txt.includes('Zusammen'));
     const ingCount = (await p.$$('.ing')).length;
     check('Zutatenliste (6 Zutaten + Zwischenüberschrift)', ingCount === 6 && (await p.textContent('.ing-head')) === 'Zum Servieren', `${ingCount}`);
-    check('3 nummerierte Schritte ohne doppelte Nummern', (await p.$$('.step')).length === 3 && !(await p.textContent('.step .tx')).startsWith('1.'));
+    check('3 nummerierte Schritte ohne doppelte Nummern', (await p.$$('.rstep')).length === 3 && !(await p.textContent('.rstep .tx')).startsWith('1.'));
     check('Quelle als Link', (await p.textContent('#recipe-box')).includes('chefkoch.de'));
     await p.click('[data-act="srv+"]'); await p.click('[data-act="srv+"]'); await p.waitForTimeout(200);
     const ingTexts = await p.$$eval('.ing span:last-child', (els) => els.map((e) => e.textContent));
     check('Auf 4 Portionen umgerechnet', ingTexts[0] === '400 g Spaghetti' && ingTexts[2] === '1 TL Chiliflocken' && ingTexts[5] === 'Parmesan', ingTexts.slice(0, 3).join(' | '));
-    await p.click('.ing[data-ing="0"]'); await p.click('.step[data-step="0"]'); await p.waitForTimeout(200);
-    check('Zutat & Schritt abhaken', (await p.getAttribute('.ing[data-ing="0"]', 'class')).includes('done') && (await p.getAttribute('.step[data-step="0"]', 'class')).includes('done'));
+    await p.click('.ing[data-ing="0"]'); await p.click('.rstep[data-step="0"]'); await p.waitForTimeout(200);
+    check('Zutat & Schritt abhaken', (await p.getAttribute('.ing[data-ing="0"]', 'class')).includes('done') && (await p.getAttribute('.rstep[data-step="0"]', 'class')).includes('done'));
 
     await go('/entries?cat=recipe', 900);
     check('Rezepte-Filter mit Gang & Zeit', (await p.textContent('#list')).includes('Hauptgericht · 20 Min.'));

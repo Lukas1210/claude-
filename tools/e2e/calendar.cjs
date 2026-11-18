@@ -111,12 +111,12 @@ exports.run = async ({ server, check }) => {
     const bg = () => p.evaluate(() => getComputedStyle(document.body).backgroundColor);
     await go('/settings', 1000);
     await p.click('[data-theme-pref="dark"]'); await p.waitForTimeout(300);
-    check('Dunkel erzwingen', (await p.evaluate(() => document.documentElement.dataset.theme)) === 'dark' && (await bg()) === 'rgb(7, 11, 23)', await bg());
+    check('Dunkel erzwingen', (await p.evaluate(() => document.documentElement.dataset.theme)) === 'dark' && (await bg()) === 'rgb(0, 0, 0)', await bg());
     await p.reload(); await p.waitForTimeout(1000);
     check('Dunkel bleibt nach Neustart', (await p.evaluate(() => document.documentElement.dataset.theme)) === 'dark');
     await go('/settings', 1000);
     await p.click('[data-theme-pref="system"]'); await p.waitForTimeout(300);
-    check('Automatisch folgt dem System (hell)', !(await p.evaluate(() => document.documentElement.dataset.theme)) && (await bg()) === 'rgb(242, 244, 249)', await bg());
+    check('Automatisch folgt dem System (hell)', !(await p.evaluate(() => document.documentElement.dataset.theme)) && (await bg()) === 'rgb(242, 242, 247)', await bg());
 
     // Galerie über Startseite erreichbar
     await go('/', 800);

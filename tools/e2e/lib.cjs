@@ -73,6 +73,8 @@ async function openApp(server, { scheme = 'light', dpr = 1, nominatim = [], notc
     go: async (hash, wait = 800) => { await p.evaluate((h) => { location.hash = h; }, hash); await p.waitForTimeout(wait); },
     scroll: async (y, wait = 400) => { await p.evaluate((y) => document.getElementById('scroller').scrollTo(0, y), y); await p.waitForTimeout(wait); },
     shot: (name) => p.screenshot({ path: path.join(SHOTS, `${name}.png`) }),
+    /** Meldungen und Effekte entfernen, damit sie nicht über einem Screenshot liegen. */
+    calm: () => p.evaluate(() => document.querySelectorAll('#toasts .toast, .fx-confetti, .fx-spark, .fx-ring').forEach((n) => n.remove())),
     iso: (n) => p.evaluate((n) => { const d = new Date(); d.setDate(d.getDate() + n); const z = (x) => String(x).padStart(2, '0'); return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`; }, n),
     close: () => browser.close(),
   };
@@ -209,6 +211,9 @@ async function seed(app, images) {
     await EV({ title: 'Wochenende in Wien', category: 'trip', allDay: true, date: rel(12), endDate: rel(14), time: null, endTime: null, reminder: 1440, place: pl('Wien', 'Wien', 'AT', 'Österreich', 48.2082, 16.3738), rsvp: { a: 'yes', b: 'maybe' } });
     await EV({ title: 'Bowling mit Freunden', category: 'activity', date: rel(-3), time: '20:00', endDate: rel(-3), endTime: '22:30', rsvp: { a: 'yes', b: 'yes' } });
     await EV({ title: 'Zahnarzt', category: 'other', date: rel(6), time: '08:30', endDate: rel(6), endTime: '09:15', reminder: 60, rsvp: { a: 'yes', b: 'no' } });
+    // Die Beispieldaten gelten als schon bekannt → keine Freischalt-Meldung beim nächsten Öffnen
+    const A = await import('./js/views/awards.js');
+    await S.setDevice({ seenAch: Object.fromEntries(A.currentResults().results.map((r) => [r.def.id, r.tier])) });
   }, b64);
   await app.p.waitForTimeout(800);
 }

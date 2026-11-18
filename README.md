@@ -1,6 +1,6 @@
 # Couple Journal
 
-Euer gemeinsames Journal fürs iPhone: Dates, Aktivitäten, Essen, selbst gekochte Rezepte, Reisen und Geschenke festhalten und **jeder für sich mit Herzen bewerten**. Dazu kommen ein **Kalender** zum Planen, Fotos, ein **Globus** mit allen Orten, an denen ihr wart, eine **Timeline** ab Tag 1 und eine **Galerie**. Die App liegt wie eine echte App auf dem Home-Bildschirm – standardmäßig in **Nachtblau & Gold**, hell oder dunkel passend zum iPhone.
+Euer gemeinsames Journal fürs iPhone: Dates, Aktivitäten, Essen, selbst gekochte Rezepte, Reisen und Geschenke festhalten und **jeder für sich mit Herzen bewerten**. Dazu kommen ein **Kalender** zum Planen, Fotos, ein **Globus** mit allen Orten, an denen ihr wart, eine **Timeline** ab Tag 1 und eine **Galerie**. Die App liegt wie eine echte App auf dem Home-Bildschirm – standardmäßig in **Indigo** mit roten Herzen, hell oder dunkel passend zum iPhone.
 
 ![Couple Journal – Startseite, Kalender, Termin, Globus, Erlebnisse und Detail in hell und dunkel](docs/screenshots.jpg)
 
@@ -20,7 +20,7 @@ Euer gemeinsames Journal fürs iPhone: Dates, Aktivitäten, Essen, selbst gekoch
 | **Filme & Serien** | Gemeinsam Geschautes bewerten (Film, Serie, Doku, Anime; Plattform, Genre, Staffel, „Empfehlen?“). Die **Watchlist** läuft über die Bucket-Liste, „Was schauen wir heute?“ wählt per Zufall – und taucht auch bei den Date-Ideen auf. |
 | **Wunschzettel** | Jeder pflegt Wünsche mit Link, Preis und „Wie sehr?“ – der andere sieht sie. „Besorg ich“-Markierungen und **geheime Geschenkideen** bleiben nur auf dem eigenen iPhone und werden nie hochgeladen. Aus einer Idee wird mit einem Tipp ein Geschenk-Eintrag. |
 | **Fotos & Galerie** | Mehrere Fotos pro Eintrag; Aufnahmedatum und Ort kommen automatisch aus dem Foto. Die Galerie sortiert nach Monaten, mit Favoriten, Filtern und Vollbild. |
-| **Globus** | Zum Drehen und Zoomen. Besuchte Länder leuchten, Herzen markieren eure Orte, Bögen führen von eurem Zuhause zu jeder Reise. Dazu Länder, Orte und Kilometer. |
+| **Globus** | Zum Drehen und Zoomen. Besuchte Länder leuchten, rote Herzen markieren eure Orte, Bögen führen von eurem Zuhause zu jeder Reise. Dazu Länder, Orte und Kilometer. |
 | **Timeline** | Ab Tag 1: Meilensteine mit Fotos, alle Erlebnisse und automatische Jahrestage sowie runde Tageszahlen. |
 | **Bucket-Liste** | Was ihr noch machen wollt. Erledigt wird daraus ein Erlebnis; „Zufall: Was machen wir?“ wählt einen offenen Wunsch aus. |
 | **Briefe** | Nachrichten aneinander, auch als **Zeitkapsel**, die sich erst ab einem Datum öffnen lässt. |
@@ -30,7 +30,7 @@ Euer gemeinsames Journal fürs iPhone: Dates, Aktivitäten, Essen, selbst gekoch
 | **Swipe-Match** | Jeder wischt für sich durch Ideen (eingebaute Date-Ideen, Bucket-Liste, Watchlist, Lieblingsorte). Wischt ihr beide nach rechts, gibt es ein **Match** – mit „Gleich planen“. Ohne Sync: Handy weitergeben. |
 | **Rückblick** | Euer Jahr (oder alles) als **Story** im Vollbild: Zahlen, Kategorien, Highlight mit Foto, Reisen, Essen & Rezepte, Filme, Duell und stärkster Monat. Am Ende als Bild teilbar. |
 | **Als Bild teilen** | Jedes Erlebnis wird zum Story-Bild (1080 × 1920) mit Foto, Titel, Datum, Ort und euren Herzen – für Instagram, WhatsApp oder AirDrop. |
-| **Farbwelten** | Nachtblau & Gold (Standard), Petrol & Koralle, Indigo, Polaroid oder Schwarz & Neon – unter Einstellungen → Farbwelt, für jedes iPhone einzeln. „Automatisch“ folgt dem Hell-/Dunkelmodus des iPhones. |
+| **Farbwelten** | Indigo (Standard), Nachtblau & Gold, Petrol & Koralle, Polaroid oder Schwarz & Neon – unter Einstellungen → Farbwelt, für jedes iPhone einzeln. „Automatisch“ folgt dem Hell-/Dunkelmodus des iPhones. |
 | **Sync & offline** | Beide iPhones sehen dieselben Daten. Die App funktioniert ohne Netz und überträgt Änderungen später. Dazu gibt es ein Backup als Datei. |
 
 ---
