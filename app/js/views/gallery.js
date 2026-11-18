@@ -4,7 +4,7 @@ import { icon } from '../ui/icons.js';
 import { get } from '../store.js';
 import { CATEGORIES, fmtMonthYear } from '../model.js';
 import { allPhotos, processFiles, commitPhotos } from '../photos.js';
-import { topbar, emptyState } from '../ui/components.js';
+import { topbar, emptyState, catIcon } from '../ui/components.js';
 import { toast } from '../ui/sheet.js';
 import { afterPaint } from '../router.js';
 import { photoInput } from '../main.js';
@@ -16,7 +16,7 @@ export async function addLoosePhotos(files) {
   const pending = await processFiles(files);
   await commitPhotos(pending, null);
   hide();
-  toast(pending.length === 1 ? 'Foto gespeichert ♡' : `${pending.length} Fotos gespeichert ♡`, { emoji: '📸' });
+  toast(pending.length === 1 ? 'Foto gespeichert' : `${pending.length} Fotos gespeichert`, { icon: 'camera' });
 }
 
 function filtered() {
@@ -46,22 +46,22 @@ function paint(el) {
     ${topbar({ title: 'Galerie', back: true, right: html`<button class="icon-btn" data-act="add" aria-label="Fotos hinzufügen">${icon('plus')}</button>` })}
     <div class="page">
       <h1 class="large-title">Galerie</h1>
-      <p class="page-sub">${photos.length ? `${photos.length} ${photos.length === 1 ? 'Foto' : 'Fotos'} · ${favs} ${favs === 1 ? 'Favorit' : 'Favoriten'}` : 'Alle eure gemeinsamen Momente'}</p>
+      <p class="page-sub">${photos.length ? `${photos.length} ${photos.length === 1 ? 'Foto' : 'Fotos'} · ${favs} ${favs === 1 ? 'Favorit' : 'Favoriten'}` : 'Alle eure Fotos'}</p>
       ${photos.length ? html`
         <div class="chips" style="margin-bottom:6px">
           <button class="chip ${state.filter === 'all' ? 'active' : ''}" data-f="all">Alle</button>
-          <button class="chip ${state.filter === 'fav' ? 'active' : ''}" data-f="fav">♥ Favoriten</button>
-          ${usedCats.map((c) => html`<button class="chip ${state.filter === c.key ? 'active' : ''}" data-f="${c.key}">${c.emoji} ${c.plural}</button>`)}
-          <button class="chip ${state.filter === 'loose' ? 'active' : ''}" data-f="loose">📸 Einfach so</button>
+          <button class="chip ${state.filter === 'fav' ? 'active' : ''}" data-f="fav">${icon('starFill')} Favoriten</button>
+          ${usedCats.map((c) => html`<button class="chip ${state.filter === c.key ? 'active' : ''}" data-f="${c.key}">${catIcon(c)} ${c.plural}</button>`)}
+          <button class="chip ${state.filter === 'loose' ? 'active' : ''}" data-f="loose">${icon('camera')} Einfach so</button>
         </div>` : ''}
       ${!photos.length
-        ? emptyState({ emoji: '📸', title: 'Noch keine Fotos', text: 'Fügt eure Lieblingsfotos hinzu – oder hängt sie direkt an ein Erlebnis.', action: html`<button class="btn primary" data-act="add">${icon('camera')} Fotos hinzufügen</button>` })
+        ? emptyState({ icon: 'camera', title: 'Noch keine Fotos', text: 'Fügt Fotos hinzu – oder hängt sie direkt an ein Erlebnis.', action: html`<button class="btn primary" data-act="add">${icon('camera')} Fotos hinzufügen</button>` })
         : !list.length
-          ? emptyState({ emoji: '🫶', title: 'Hier ist noch nichts', text: 'In dieser Auswahl gibt es noch keine Fotos.' })
+          ? emptyState({ icon: 'gallery', title: 'Hier ist noch nichts', text: 'In dieser Auswahl gibt es noch keine Fotos.' })
           : groups.map((g) => html`
             <div class="gallery-month"><h3>${fmtMonthYear(g.key + '-01')}</h3><span>${g.items.length}</span></div>
             <div class="gallery-grid">
-              ${g.items.map((p) => html`<button class="g" data-idx="${idx++}" aria-label="Foto öffnen"><img data-photo="${p.id}" data-size="thumb" alt="">${p.data.favorite ? html`<span class="fav">${icon('heartFill')}</span>` : ''}</button>`)}
+              ${g.items.map((p) => html`<button class="g" data-idx="${idx++}" aria-label="Foto öffnen"><img data-photo="${p.id}" data-size="thumb" alt="">${p.data.favorite ? html`<span class="fav">${icon('starFill')}</span>` : ''}</button>`)}
             </div>`)}
     </div>`);
   afterPaint(el);

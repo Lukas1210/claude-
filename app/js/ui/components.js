@@ -5,7 +5,7 @@ import { CATEGORIES, avgRating, ratingValue, fmtRating, fmtDate, fmtRange, catOf
 import { coverOf } from '../photos.js';
 import { shortPlace } from '../geo.js';
 import { nameOf } from '../store.js';
-import { heartBurst } from './fx.js';
+import { sparkBurst } from './fx.js';
 
 /** Herzen-Anzeige (0–5, halbe Schritte). */
 export function hearts(value, { lg = false } = {}) {
@@ -76,7 +76,7 @@ export function mountHeartInput(host, { value = null, onChange } = {}) {
     dragging = false;
     if (val === 5) {
       const r = hs[4].getBoundingClientRect();
-      heartBurst(r.left + r.width / 2, r.top + r.height / 2, 12);
+      sparkBurst(r.left + r.width / 2, r.top + r.height / 2, 12);
     }
   };
   host.addEventListener('pointerup', end);
@@ -90,11 +90,21 @@ export function photoImg(id, { size = 'thumb', cls = '', alt = '' } = {}) {
   return html`<div class="ph-wrap ${cls}"><img data-photo="${id}" data-size="${size}" alt="${alt}"></div>`;
 }
 
-export function thumb(entry, emoji) {
+/** Kategorie-Symbol in einer farbig getönten Kachel (size: sm | md | lg | fill). */
+export function catBadge(c, { size = 'md', cls = '' } = {}) {
+  return html`<span class="cat-badge ${size} ${cls}" style="--c:${c?.color || 'var(--text2)'}">${icon(c?.icon || 'sparkles')}</span>`;
+}
+
+/** Kleines farbiges Kategorie-Symbol für Textzeilen und Chips. */
+export function catIcon(c) {
+  return html`<span class="cat-ico" style="--c:${c?.color || 'var(--text2)'}">${icon(c?.icon || 'sparkles')}</span>`;
+}
+
+export function thumb(entry) {
   const cover = coverOf(entry);
   return cover
     ? html`<img data-photo="${cover}" data-size="thumb" alt="">`
-    : html`<span>${emoji || catOf(entry).emoji}</span>`;
+    : catBadge(catOf(entry), { size: 'fill' });
 }
 
 /** Listen-Karte für ein Erlebnis. */
@@ -113,7 +123,7 @@ export function entryCard(entry) {
       <div class="entry-thumb">${thumb(entry)}</div>
       <div class="entry-body">
         <div class="entry-title">${d.favorite ? html`<span class="fav-dot">${icon('starFill')}</span> ` : ''}${d.title || c.label}</div>
-        <div class="entry-meta">${c.emoji} ${meta.filter(Boolean).join(' · ')}</div>
+        <div class="entry-meta">${catIcon(c)} ${meta.filter(Boolean).join(' · ')}</div>
         <div class="entry-rating">${hearts(avg)}${avg != null ? html`<span class="rating-num">${fmtRating(avg)}</span>` : html`<span class="faint">noch nicht bewertet</span>`}</div>
       </div>
     </a>`;
@@ -127,18 +137,19 @@ export function entryHero(entry, { width = 260 } = {}) {
   const avg = avgRating(entry);
   return html`
     <a class="entry-hero-card card-link" href="#/entry/${entry.id}" style="width:${width}px">
-      ${cover ? html`<img data-photo="${cover}" data-size="thumb" alt="">` : html`<div class="emoji-bg">${c.emoji}</div>`}
+      ${cover ? html`<img data-photo="${cover}" data-size="thumb" alt="">` : html`<div class="emoji-bg" style="--c:${c.color}">${icon(c.icon)}</div>`}
       <div class="shade"></div>
       <div class="info">
-        <div class="faint" style="font-size:12.5px;color:rgba(255,255,255,.75)">${c.emoji} ${fmtDate(d.date)}</div>
+        <div class="kicker" style="color:rgba(255,255,255,.8)">${c.label} · ${fmtDate(d.date)}</div>
         <h3>${d.title || c.label}</h3>
         ${avg != null ? html`<div style="margin-top:4px">${hearts(avg)}</div>` : ''}
       </div>
     </a>`;
 }
 
-export function emptyState({ emoji = '💞', title, text = '', action = '' }) {
-  return html`<div class="empty"><span class="em">${emoji}</span><h3>${title}</h3>${text ? html`<p>${text}</p>` : ''}${action}</div>`;
+export function emptyState({ emoji = '', icon: ico = 'sparkles', title, text = '', action = '' }) {
+  const lead = emoji ? html`<span class="em">${emoji}</span>` : html`<span class="em-ico">${icon(ico)}</span>`;
+  return html`<div class="empty">${lead}<h3>${title}</h3>${text ? html`<p>${text}</p>` : ''}${action}</div>`;
 }
 
 /** Kopfzeile mit iOS-Verhalten. */
@@ -165,5 +176,5 @@ export function ratingPair(entry) {
 
 export const categoryChips = (active, counts = {}) => html`
   <div class="chips">
-    ${Object.values(CATEGORIES).map((c) => html`<button class="chip ${active === c.key ? 'active' : ''}" data-cat="${c.key}">${c.emoji} ${c.plural}${counts[c.key] != null ? html` <span class="count">${counts[c.key]}</span>` : ''}</button>`)}
+    ${Object.values(CATEGORIES).map((c) => html`<button class="chip ${active === c.key ? 'active' : ''}" data-cat="${c.key}">${catIcon(c)} ${c.plural}${counts[c.key] != null ? html` <span class="count">${counts[c.key]}</span>` : ''}</button>`)}
   </div>`;

@@ -212,11 +212,11 @@ export async function syncNow({ silent = false } = {}) {
         const letter = interesting.find((r) => r.type === 'letter' && r.data?.to === me());
         const who = nameOf(partner());
         const event = interesting.find((r) => r.type === 'event');
-        if (letter) toast(`${who} hat dir einen Liebesbrief geschrieben`, { emoji: '💌', duration: 4000 });
-        else if (event && event.created_by === me()) toast(`${who} hat auf „${event.data?.title || 'deinen Termin'}“ geantwortet`, { emoji: '📅', duration: 4000 });
-        else if (event) toast(`${who} hat einen Termin eingetragen: ${event.data?.title || ''}`, { emoji: '📅', duration: 4000 });
-        else if (interesting.length) toast(`${who} hat etwas Neues hinzugefügt ♡`, { emoji: '✨', duration: 3500 });
-        else toast(`${who} hat ${photos === 1 ? 'ein Foto' : `${photos} Fotos`} hinzugefügt`, { emoji: '📸', duration: 3500 });
+        if (letter) toast(`Neuer Brief von ${who}`, { icon: 'letter', duration: 4000 });
+        else if (event && event.created_by === me()) toast(`${who} hat auf „${event.data?.title || 'deinen Termin'}“ geantwortet`, { icon: 'calendar', duration: 4000 });
+        else if (event) toast(`${who} hat einen Termin eingetragen: ${event.data?.title || ''}`, { icon: 'calendar', duration: 4000 });
+        else if (interesting.length) toast(`${who} hat etwas Neues eingetragen`, { icon: 'sparkles', duration: 3500 });
+        else toast(`${who} hat ${photos === 1 ? 'ein Foto' : `${photos} Fotos`} hinzugefügt`, { icon: 'camera', duration: 3500 });
       }
     } catch (e) {
       console.warn('Sync-Fehler', e);

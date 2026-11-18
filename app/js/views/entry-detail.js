@@ -2,12 +2,12 @@
 import { html } from '../ui/dom.js';
 import { icon } from '../ui/icons.js';
 import { get, remove, update, nameOf, me } from '../store.js';
-import { EXTRA_FIELDS, fmtDateLong, fmtRange, fmtMoney, catOf, giftLine, fmtDate } from '../model.js';
-import { ratingPair, emptyState, mountHeartInput } from '../ui/components.js';
+import { EXTRA_FIELDS, fmtDateLong, fmtRange, fmtMoney, catOf, giftLine, fmtDate, normalizeOption } from '../model.js';
+import { ratingPair, emptyState, mountHeartInput, catBadge, catIcon } from '../ui/components.js';
 import { photosOf, deletePhotos } from '../photos.js';
 import { placeLabel, flag } from '../geo.js';
 import { openSheet, toast, actionSheet, confirmDialog } from '../ui/sheet.js';
-import { heartBurst } from '../ui/fx.js';
+import { sparkBurst } from '../ui/fx.js';
 import { back, go } from '../router.js';
 import { parseIngredients, scaleIngredient, parseSteps, isUrl, hostOf, setKeepAwake, keepAwakeSupported, isKeepingAwake } from '../recipe.js';
 
@@ -16,7 +16,7 @@ export async function deleteEntry(id) {
   if (!e) return;
   await deletePhotos(photosOf(e));
   await remove(id);
-  toast('Erinnerung gelöscht', { emoji: '🗑️' });
+  toast('Gelöscht', { icon: 'trash' });
   back('/entries');
 }
 
@@ -27,10 +27,10 @@ function factValue(f, v) {
     case 'price': return '€'.repeat(+v);
     case 'yesno': return { yes: '👍 Unbedingt', maybe: '🤔 Vielleicht', no: '👎 Eher nicht' }[v];
     case 'partner': return `${nameOf(v)} → ${nameOf(v === 'a' ? 'b' : 'a')}`;
-    case 'toggle': return v ? 'Ja ♡' : null;
+    case 'toggle': return v ? 'Ja' : null;
     case 'number': return `${v} ${f.unit || ''}`.trim();
-    case 'who': return v === 'both' ? '👫 Zusammen' : nameOf(v);
-    default: return v;
+    case 'who': return v === 'both' ? 'Zusammen' : nameOf(v);
+    default: return normalizeOption(v);
   }
 }
 
@@ -66,7 +66,7 @@ function recipeHtml(entry) {
       </div>` : ''}
     ${steps.length ? html`
       <div class="section">
-        <div class="section-head"><h2 class="section-title small">Zubereitung</h2>${keepAwakeSupported() ? html`<button class="section-link" data-act="awake">${isKeepingAwake() ? '☀️ Bildschirm bleibt an' : 'Kochmodus'}</button>` : ''}</div>
+        <div class="section-head"><h2 class="section-title small">Zubereitung</h2>${keepAwakeSupported() ? html`<button class="section-link" data-act="awake">${isKeepingAwake() ? html`${icon('sun')} Bildschirm bleibt an` : 'Kochmodus'}</button>` : ''}</div>
         <div class="steps">
           ${steps.map((t, i) => html`<button class="step ${st.steps.has(i) ? 'done' : ''}" data-step="${i}"><span class="no">${st.steps.has(i) ? icon('check') : i + 1}</span><span class="tx">${t}</span></button>`)}
         </div>
@@ -105,7 +105,7 @@ export function openRatingSheet(entry, slot) {
     ratings[slot] = { value: val, comment: sheet.body.querySelector('#rc').value.trim() };
     await update(entry.id, { ratings });
     const b = t.getBoundingClientRect();
-    if (val >= 4.5) heartBurst(b.left + b.width / 2, b.top + b.height / 2, 14);
+    if (val >= 4.5) sparkBurst(b.left + b.width / 2, b.top + b.height / 2, 14);
     sheet.close();
   });
 }
@@ -113,7 +113,7 @@ export function openRatingSheet(entry, slot) {
 export function render(el, { id }) {
   const entry = get(id);
   if (!entry) {
-    el.innerHTML = String(html`<div class="page" style="padding-top:calc(var(--safe-t) + 20px)"><button class="back-btn" data-act="back">${icon('back')}Zurück</button>${emptyState({ emoji: '🕊️', title: 'Nicht gefunden', text: 'Diese Erinnerung wurde gelöscht.' })}</div>`);
+    el.innerHTML = String(html`<div class="page" style="padding-top:calc(var(--safe-t) + 20px)"><button class="back-btn" data-act="back">${icon('back')}Zurück</button>${emptyState({ icon: 'search', title: 'Nicht gefunden', text: 'Dieser Eintrag wurde gelöscht.' })}</div>`);
     return;
   }
   const d = entry.data;
@@ -134,7 +134,7 @@ export function render(el, { id }) {
       <div class="topbar-right"><button class="icon-btn" data-act="edit" aria-label="Bearbeiten">${icon('edit')}</button></div>
     </header>
     <div class="page">
-      <div class="detail-hero ${ordered.length ? '' : 'no-photo'}">
+      <div class="detail-hero ${ordered.length ? '' : 'no-photo'}" style="--c:${c.color}">
         <div class="detail-float-bar">
           <button class="icon-btn" data-act="back" data-fallback="/entries" aria-label="Zurück">${icon('back')}</button>
           <div class="row" style="gap:8px">
@@ -146,13 +146,13 @@ export function render(el, { id }) {
           <div class="slides">${ordered.map((pid, i) => html`<div class="slide" data-slide="${i}"><div class="ph-wrap" style="width:100%;height:100%"><img data-photo="${pid}" data-size="full" alt=""></div></div>`)}</div>
           <div class="shade"></div>
           ${ordered.length > 1 ? html`<div class="dots">${ordered.map((_, i) => html`<span class="${i === 0 ? 'on' : ''}"></span>`)}</div>` : ''}
-        ` : html`<div class="big-em">${c.emoji}</div>`}
+        ` : html`<div class="big-em">${catBadge(c, { size: 'xl' })}</div>`}
       </div>
 
       <div class="detail-head">
         <div class="row" style="gap:8px;margin-bottom:8px">
-          <span class="chip static active">${c.emoji} ${c.label}</span>
-          ${d.favorite ? html`<span class="chip static" style="color:var(--champ)">${icon('starFill')} Lieblingsmoment</span>` : ''}
+          <span class="chip static active">${catIcon(c)} ${c.label}</span>
+          ${d.favorite ? html`<span class="chip static" style="color:var(--champ)">${icon('starFill')} Favorit</span>` : ''}
         </div>
         <h1>${d.title}</h1>
         <div class="detail-meta">
@@ -165,7 +165,7 @@ export function render(el, { id }) {
       </div>
 
       <div class="section">
-        <div class="section-head"><h2 class="section-title small">Unsere Bewertung</h2></div>
+        <div class="section-head"><h2 class="section-title small">Bewertung</h2></div>
         <div data-act="rate-area">${ratingPair(entry)}</div>
         ${myMissing ? html`<button class="btn primary block" data-act="rate" data-slot="${me()}" style="margin-top:12px">${icon('heartFill')} Jetzt bewerten</button>` : ''}
       </div>
@@ -215,7 +215,7 @@ export function render(el, { id }) {
       else if (r.dataset.act === 'srv+') st.servings = Math.min(50, (st.servings || base) + 1);
       else if (r.dataset.act === 'awake') {
         const ok = await setKeepAwake(!isKeepingAwake());
-        toast(isKeepingAwake() ? 'Kochmodus an – der Bildschirm bleibt an' : ok === false ? 'Kochmodus wird hier nicht unterstützt' : 'Kochmodus aus', { emoji: '👩‍🍳' });
+        toast(isKeepingAwake() ? 'Kochmodus an – der Bildschirm bleibt an' : ok === false ? 'Kochmodus wird hier nicht unterstützt' : 'Kochmodus aus', { icon: 'chef' });
       }
       repaintRecipe();
       return;
@@ -242,7 +242,7 @@ export function render(el, { id }) {
       case 'more': {
         const v = await actionSheet({
           items: [
-            { label: d.favorite ? 'Kein Lieblingsmoment mehr' : 'Als Lieblingsmoment markieren', icon: 'star', value: 'fav' },
+            { label: d.favorite ? 'Kein Favorit mehr' : 'Als Favorit markieren', icon: 'star', value: 'fav' },
             ...(d.place?.lat != null ? [{ label: 'Auf dem Globus zeigen', icon: 'globe', value: 'globe' }] : []),
             { label: 'Löschen', icon: 'trash', value: 'delete', danger: true },
           ],
@@ -250,7 +250,7 @@ export function render(el, { id }) {
         if (v === 'fav') await update(entry.id, { favorite: !d.favorite });
         if (v === 'globe') go(`/globe?focus=${entry.id}`);
         if (v === 'delete') {
-          const ok = await confirmDialog({ title: 'Erinnerung löschen?', message: 'Auch die zugehörigen Fotos werden gelöscht.', ok: 'Löschen', danger: true });
+          const ok = await confirmDialog({ title: 'Eintrag löschen?', message: 'Auch die zugehörigen Fotos werden gelöscht.', ok: 'Löschen', danger: true });
           if (ok) deleteEntry(entry.id);
         }
         break;

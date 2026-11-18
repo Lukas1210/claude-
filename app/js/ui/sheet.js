@@ -1,6 +1,6 @@
 // Bottom-Sheets, Aktionsmenüs, Dialoge und Toasts im iOS-Stil.
 import { html, esc, nextFrame } from './dom.js';
-import { icon } from './icons.js';
+import { icon, iconStr } from './icons.js';
 
 let zBase = 100;
 const openSheets = [];
@@ -108,7 +108,7 @@ export function actionSheet({ title = '', items = [], layout = 'list' }) {
   return new Promise((resolve) => {
     let chosen;
     const body = layout === 'grid'
-      ? html`<div class="action-grid">${items.map((it, i) => html`<button class="action-item" data-i="${i}"><span class="em">${it.emoji || ''}</span><span>${it.label}</span></button>`)}</div>`
+      ? html`<div class="action-grid">${items.map((it, i) => html`<button class="action-item" data-i="${i}"><span class="em">${it.icon ? html`<span class="cat-badge lg" style="--c:${it.color || 'var(--accent-ink)'}">${icon(it.icon)}</span>` : it.emoji || ''}</span><span>${it.label}</span></button>`)}</div>`
       : html`<div class="action-list">${items.map((it, i) => html`<button class="action-row ${it.danger ? 'danger' : ''}" data-i="${i}">${it.icon ? icon(it.icon) : ''}${it.emoji ? html`<span>${it.emoji}</span>` : ''}<span>${it.label}</span></button>`)}</div>`;
     const s = openSheet({ title, body, className: 'action-sheet', onClose: () => resolve(chosen) });
     s.body.addEventListener('click', (e) => {
@@ -153,8 +153,16 @@ export function confirmDialog({ title, message = '', ok = 'OK', cancel = 'Abbrec
   });
 }
 
-/** Kurze Nachricht oben. */
-export function toast(message, { actionLabel, onAction, duration = 2600, emoji } = {}) {
+// Emojis aus älteren Aufrufen → schlichte Icons
+const EMOJI_ICON = {
+  '📅': 'calendar', '🗑️': 'trash', '⚠️': 'info', '✅': 'check', '💾': 'download', '☁️': 'cloud', '📍': 'pin', '✍️': 'edit',
+  '📸': 'camera', '📷': 'camera', '🔒': 'lock', '💌': 'letter', '🌠': 'star', '⏰': 'clock', '📤': 'share', 'ℹ️': 'info',
+  '🎉': 'sparkles', '✨': 'sparkles', '🤔': 'info', '❌': 'x', '💕': 'user', '🍳': 'chef', '👩‍🍳': 'chef',
+};
+
+/** Kurze Nachricht oben. `icon` = Name aus icons.js (bevorzugt), `emoji` nur noch als Rückfall. */
+export function toast(message, { actionLabel, onAction, duration = 2600, emoji, icon: ico } = {}) {
+  const iconName = ico || EMOJI_ICON[emoji];
   let host = document.getElementById('toasts');
   if (!host) {
     host = document.createElement('div');
@@ -163,7 +171,8 @@ export function toast(message, { actionLabel, onAction, duration = 2600, emoji }
   }
   const t = document.createElement('div');
   t.className = 'toast';
-  t.innerHTML = `${emoji ? `<span>${esc(emoji)}</span>` : ''}<span>${esc(message)}</span>${actionLabel ? `<button>${esc(actionLabel)}</button>` : ''}`;
+  const lead = iconName ? `<span class="t-ico">${iconStr(iconName)}</span>` : emoji ? `<span>${esc(emoji)}</span>` : '';
+  t.innerHTML = `${lead}<span>${esc(message)}</span>${actionLabel ? `<button>${esc(actionLabel)}</button>` : ''}`;
   host.appendChild(t);
   const hide = () => {
     t.classList.add('out');

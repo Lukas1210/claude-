@@ -197,5 +197,5 @@ check('Leerlauf-Sync überträgt nichts', r.pushed === 0 && r.fromPartner === 0,
 
 await browser.close();
 server.close();
-console.log(failed ? `\n${failed} Test(s) fehlgeschlagen` : '\nAlle Sync-Tests bestanden ♡');
+console.log(failed ? `\n${failed} Test(s) fehlgeschlagen` : '\nAlle Sync-Tests bestanden');
 process.exit(failed ? 1 : 0);

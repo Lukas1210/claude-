@@ -11,7 +11,7 @@ import { placeLabel, flag } from '../geo.js';
 import { getStatus, onStatus, isConfigured, currentUser, login, logout, syncNow, setCredentials, config } from '../sync.js';
 import { getBlob } from '../photos.js';
 import { afterPaint, refresh } from '../router.js';
-import { getThemePref, setThemePref } from '../theme.js';
+import { getThemePref, setThemePref, getPalette, setPalette, PALETTES, effectiveTheme } from '../theme.js';
 
 export const live = true;
 
@@ -89,7 +89,7 @@ async function syncSection() {
         <div class="cell"><span class="cell-icon">${icon('cloud')}</span><span class="grow">Sync ist noch nicht eingerichtet</span></div>
         <button class="cell link" data-act="creds" style="width:100%;text-align:left"><span class="grow rose">Zugangsdaten eingeben</span><span class="chev">${icon('chevron')}</span></button>
       </div>
-      <div class="group-foot">Mit Sync seht ihr beide alle Erinnerungen und Fotos auf euren Handys. Die Anleitung steht im README.</div>`;
+      <div class="group-foot">Mit Sync seht ihr beide alle Einträge und Fotos auf euren Handys. Die Anleitung steht im README.</div>`;
   }
   const user = await currentUser();
   if (!user) {
@@ -184,8 +184,8 @@ export async function render(el) {
             <div class="cell"><label>Name 1</label><input data-s="name-a" value="${s.names.a}" placeholder="Name"></div>
             <div class="cell"><label>Name 2</label><input data-s="name-b" value="${s.names.b}" placeholder="Name"></div>
             <div class="cell"><label>Zusammen seit</label><input type="date" placeholder="Datum wählen" data-s="startDate" value="${s.startDate || ''}"></div>
-            <div class="cell"><label>🎂 ${nameOf('a')}</label><input type="date" placeholder="Datum wählen" data-s="bday-a" value="${s.birthdays.a || ''}"></div>
-            <div class="cell"><label>🎂 ${nameOf('b')}</label><input type="date" placeholder="Datum wählen" data-s="bday-b" value="${s.birthdays.b || ''}"></div>
+            <div class="cell"><label>${icon('cake')} ${nameOf('a')}</label><input type="date" placeholder="Datum wählen" data-s="bday-a" value="${s.birthdays.a || ''}"></div>
+            <div class="cell"><label>${icon('cake')} ${nameOf('b')}</label><input type="date" placeholder="Datum wählen" data-s="bday-b" value="${s.birthdays.b || ''}"></div>
             <button class="cell link" data-act="home" style="width:100%;text-align:left">
               <label>Zuhause</label>
               <span class="value grow ellipsis">${s.home ? html`${flag(s.home.countryCode)} ${placeLabel(s.home)}` : 'Festlegen'}</span>
@@ -222,6 +222,14 @@ export async function render(el) {
         </div>
 
         <div>
+          <div class="group-label">Farbwelt</div>
+          <div class="palette-grid">
+            ${Object.entries(PALETTES).map(([k, p]) => html`<button class="palette ${getPalette() === k ? 'active' : ''}" data-palette-pick="${k}" aria-pressed="${getPalette() === k}"><span class="sw" style="--a:${p[effectiveTheme()].swatch[0]};--b:${p[effectiveTheme()].swatch[1]}"></span><span>${p.name}</span></button>`)}
+          </div>
+          <div class="group-foot">Gilt nur für dieses iPhone – jeder von euch kann seine eigene Farbwelt wählen.</div>
+        </div>
+
+        <div>
           <div class="group-label">Synchronisation</div>
           ${syncHtml}
         </div>
@@ -239,11 +247,11 @@ export async function render(el) {
           <div class="group-label">App</div>
           <div class="group">
             ${!standalone ? html`<button class="cell link" data-act="install" style="width:100%;text-align:left"><span class="cell-icon">${icon('share')}</span><span class="grow">Zum Home-Bildschirm hinzufügen</span><span class="chev">${icon('chevron')}</span></button>` : ''}
-            <div class="cell"><span class="cell-icon">${icon('heart')}</span><span class="grow">Couple Journal</span><span class="value">Version ${APP_VERSION}</span></div>
+            <div class="cell"><span class="cell-icon" style="font-family:var(--font-display);font-weight:700;font-size:17px">&amp;</span><span class="grow">Couple Journal</span><span class="value">Version ${APP_VERSION}</span></div>
             <button class="cell link" data-act="reset" style="width:100%;text-align:left"><span class="cell-icon danger">${icon('trash')}</span><span class="grow" style="color:var(--danger)">Daten auf diesem iPhone löschen</span></button>
           </div>
         </div>
-        <p class="center faint" style="font-size:12.5px">Mit ♡ gemacht für ${nameOf('a')} &amp; ${nameOf('b')}</p>
+        <p class="center faint" style="font-size:12.5px">Couple Journal · ${nameOf('a')} &amp; ${nameOf('b')}</p>
       </div>
     </div>`);
   afterPaint(el);
@@ -273,7 +281,7 @@ export async function render(el) {
     btn.disabled = true;
     try {
       await login(el.querySelector('#le').value, el.querySelector('#lp').value);
-      toast('Angemeldet – Sync läuft ♡', { emoji: '☁️' });
+      toast('Angemeldet – Sync läuft', { icon: 'cloud' });
       refresh();
     } catch (ex) {
       toast(ex.message, { emoji: '⚠️', duration: 3500 });
@@ -281,8 +289,13 @@ export async function render(el) {
     }
   };
   const onClick = async (e) => {
-    const t = e.target.closest('[data-act], [data-me], [data-anniv], [data-theme-pref]');
+    const t = e.target.closest('[data-act], [data-me], [data-anniv], [data-theme-pref], [data-palette-pick]');
     if (!t) return;
+    if (t.dataset.palettePick) {
+      setPalette(t.dataset.palettePick);
+      el.querySelectorAll('[data-palette-pick]').forEach((b) => { b.classList.toggle('active', b === t); b.setAttribute('aria-pressed', String(b === t)); });
+      return;
+    }
     if (t.dataset.themePref) {
       setThemePref(t.dataset.themePref);
       el.querySelectorAll('[data-theme-pref]').forEach((b) => b.classList.toggle('active', b === t));
@@ -304,7 +317,7 @@ export async function render(el) {
         if (await confirmDialog({ title: 'Abmelden?', message: 'Deine Daten bleiben auf diesem iPhone, werden aber nicht mehr abgeglichen.', ok: 'Abmelden', danger: true })) { await logout(); refresh(); }
         break;
       case 'export': {
-        const v = await actionSheet({ title: 'Backup exportieren', items: [{ label: 'Komplett mit Fotos', emoji: '📸', value: 'full' }, { label: 'Nur Texte & Bewertungen', emoji: '📝', value: 'text' }] });
+        const v = await actionSheet({ title: 'Backup exportieren', items: [{ label: 'Komplett mit Fotos', icon: 'camera', value: 'full' }, { label: 'Nur Texte & Bewertungen', icon: 'list', value: 'text' }] });
         if (v) exportBackup(v === 'full');
         break;
       }

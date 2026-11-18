@@ -7,3 +7,4 @@
 | topojson-client.min.js | [topojson-client](https://github.com/topojson/topojson-client) | 3.1.0 | ISC |
 | supabase.min.js | [supabase-js](https://github.com/supabase/supabase-js) | 2.119.0 | MIT |
 | ../assets/geo/countries-*.json | [world-atlas](https://github.com/topojson/world-atlas) (Natural Earth) | 2.0.2 | ISC / Public Domain |
+| fonts/space-grotesk-latin.woff2 | [Space Grotesk](https://github.com/floriankarsten/space-grotesk) (über @fontsource-variable/space-grotesk) | 5.3.0 | SIL Open Font License 1.1 (fonts/OFL.txt) |

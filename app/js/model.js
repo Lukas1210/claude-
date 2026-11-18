@@ -1,20 +1,20 @@
 // Kategorien, Felder und Formatierungs-Helfer.
 import { settings, nameOf } from './store.js';
 
-export const APP_VERSION = '1.0.0';
+export const APP_VERSION = '2.0.0';
 
 export const CATEGORIES = {
-  date: { key: 'date', label: 'Date', plural: 'Dates', emoji: '🌹', hint: 'Ein besonderer Abend zu zweit' },
-  activity: { key: 'activity', label: 'Aktivität', plural: 'Aktivitäten', emoji: '🎡', hint: 'Ausflüge, Konzerte, Sport …' },
-  food: { key: 'food', label: 'Essen', plural: 'Essen', emoji: '🍝', hint: 'Restaurants, Cafés & Lieferdienste' },
-  recipe: { key: 'recipe', label: 'Rezept', plural: 'Rezepte', emoji: '👩‍🍳', hint: 'Was wir selbst gekocht und gebacken haben' },
-  trip: { key: 'trip', label: 'Reise', plural: 'Reisen', emoji: '✈️', hint: 'Urlaube & Wochenendtrips' },
-  gift: { key: 'gift', label: 'Geschenk', plural: 'Geschenke', emoji: '🎁', hint: 'Was wir uns geschenkt haben' },
+  date: { key: 'date', label: 'Date', plural: 'Dates', emoji: '🍸', icon: 'glass', color: 'var(--c-date)', hint: 'Ausgehen, Kino, Abende zu zweit' },
+  activity: { key: 'activity', label: 'Aktivität', plural: 'Aktivitäten', emoji: '🎟️', icon: 'ticket', color: 'var(--c-activity)', hint: 'Ausflüge, Konzerte, Sport …' },
+  food: { key: 'food', label: 'Essen', plural: 'Essen', emoji: '🍽️', icon: 'fork', color: 'var(--c-food)', hint: 'Restaurants, Cafés & Lieferdienste' },
+  recipe: { key: 'recipe', label: 'Rezept', plural: 'Rezepte', emoji: '🍳', icon: 'chef', color: 'var(--c-recipe)', hint: 'Selbst gekocht und gebacken', noPlace: true },
+  trip: { key: 'trip', label: 'Reise', plural: 'Reisen', emoji: '✈️', icon: 'plane', color: 'var(--c-trip)', hint: 'Urlaube & Wochenendtrips' },
+  gift: { key: 'gift', label: 'Geschenk', plural: 'Geschenke', emoji: '🎁', icon: 'gift', color: 'var(--c-gift)', hint: 'Was ihr euch geschenkt habt' },
 };
 export const CATEGORY_KEYS = Object.keys(CATEGORIES);
 
-const MOODS = ['😍 Verliebt', '🌙 Romantisch', '🥰 Gemütlich', '😂 Lustig', '🤩 Aufregend', '😌 Entspannt', '🥳 Ausgelassen'];
-const OCCASIONS = ['🎂 Geburtstag', '💞 Jahrestag', '🎄 Weihnachten', '💘 Valentinstag', '🌷 Einfach so', '🎓 Erfolg', '✨ Sonstiges'];
+const MOODS = ['🔥 Episch', '✨ Besonders', '😂 Lustig', '🤩 Aufregend', '😌 Entspannt', '🛋️ Gemütlich', '🥳 Wild', '😐 Naja'];
+const OCCASIONS = ['🎂 Geburtstag', '🗓️ Jahrestag', '🎄 Weihnachten', '💐 Valentinstag', '🎲 Einfach so', '🏆 Erfolg', '✨ Sonstiges'];
 const TRANSPORT = ['✈️ Flug', '🚆 Zug', '🚗 Auto', '🚌 Bus', '⛴️ Fähre', '🚲 Fahrrad', '🚶 Zu Fuß'];
 const MEALS = ['🥐 Frühstück', '🥗 Mittag', '🍷 Abendessen', '🍰 Café & Kuchen', '🍸 Drinks', '🛵 Bestellt'];
 const COURSES = ['🥐 Frühstück', '🥗 Vorspeise', '🍝 Hauptgericht', '🥦 Beilage', '🍰 Dessert', '🧁 Gebacken', '🍿 Snack', '🍹 Getränk'];
@@ -62,15 +62,33 @@ export const EXTRA_FIELDS = {
   ],
 };
 
-export const MILESTONE_EMOJIS = ['💞', '💋', '💌', '🌹', '💍', '🏡', '🔑', '🐶', '✈️', '🎉', '👶', '🎓', '🌅', '⭐️', '🥂', '📸'];
+export const MILESTONE_EMOJIS = ['⭐️', '☕️', '💍', '🏡', '🔑', '🐶', '✈️', '🎉', '👶', '🎓', '🚗', '🏆', '🌅', '🥂', '📸', '🎸'];
+
+/** Alte (kitschige) Auswahlwerte → neue Werte. Gespeicherte Einträge bleiben so lesbar. */
+export const LEGACY_OPTIONS = {
+  '😍 Verliebt': '🔥 Episch',
+  '🌙 Romantisch': '✨ Besonders',
+  '🥰 Gemütlich': '🛋️ Gemütlich',
+  '🥳 Ausgelassen': '🥳 Wild',
+  '💞 Jahrestag': '🗓️ Jahrestag',
+  '💘 Valentinstag': '💐 Valentinstag',
+  '🌷 Einfach so': '🎲 Einfach so',
+  '🎓 Erfolg': '🏆 Erfolg',
+};
+export const normalizeOption = (v) => (typeof v === 'string' && LEGACY_OPTIONS[v]) || v;
+export function normalizeExtra(category, extra = {}) {
+  const out = { ...extra };
+  for (const f of EXTRA_FIELDS[category] || []) if (f.type === 'select' && out[f.key]) out[f.key] = normalizeOption(out[f.key]);
+  return out;
+}
 
 export const WISH_CATEGORIES = [
-  { key: 'trip', emoji: '✈️', label: 'Reise' },
-  { key: 'food', emoji: '🍝', label: 'Essen' },
-  { key: 'recipe', emoji: '👩‍🍳', label: 'Rezept' },
-  { key: 'activity', emoji: '🎡', label: 'Erlebnis' },
-  { key: 'date', emoji: '🌹', label: 'Date' },
-  { key: 'other', emoji: '✨', label: 'Sonstiges' },
+  { key: 'trip', emoji: '✈️', icon: 'plane', color: 'var(--c-trip)', label: 'Reise' },
+  { key: 'food', emoji: '🍽️', icon: 'fork', color: 'var(--c-food)', label: 'Essen' },
+  { key: 'recipe', emoji: '🍳', icon: 'chef', color: 'var(--c-recipe)', label: 'Rezept' },
+  { key: 'activity', emoji: '🎟️', icon: 'ticket', color: 'var(--c-activity)', label: 'Erlebnis' },
+  { key: 'date', emoji: '🍸', icon: 'glass', color: 'var(--c-date)', label: 'Date' },
+  { key: 'other', emoji: '✨', icon: 'sparkles', color: 'var(--c-milestone)', label: 'Sonstiges' },
 ];
 
 // ---------- Bewertungen ----------
@@ -192,19 +210,3 @@ export function giftLine(entry) {
 export function startDate() {
   return settings().startDate;
 }
-
-// ---------- Kleine Liebesgrüße für die Startseite ----------
-export const LOVE_LINES = [
-  'Mit dir ist jeder Tag ein kleines Abenteuer.',
-  'Zuhause ist da, wo du bist.',
-  'Lieblingsmensch – heute, morgen, immer.',
-  'Die schönsten Erinnerungen haben wir noch vor uns.',
-  'Du und ich – das ist meine liebste Geschichte.',
-  'Ich würde dich jedes Mal wieder finden.',
-  'Mit dir ist sogar Alltag schön.',
-  'Danke für jedes Lachen, das wir teilen.',
-  'Wir sammeln Momente, keine Dinge.',
-  'Hand in Hand ist der schönste Weg.',
-  'Du bist mein Lieblingsplatz auf der Welt.',
-  'Ein Leben ist zu kurz, um es nicht mit dir zu verbringen.',
-];

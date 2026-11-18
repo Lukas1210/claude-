@@ -3,7 +3,7 @@ import { html } from '../ui/dom.js';
 import { icon } from '../ui/icons.js';
 import { all, nameOf } from '../store.js';
 import { CATEGORIES, avgRating, sortByDateDesc, fmtRating, ratingValue } from '../model.js';
-import { entryCard, emptyState, topbar } from '../ui/components.js';
+import { entryCard, emptyState, topbar, catIcon } from '../ui/components.js';
 import { openEntryForm } from './entry-form.js';
 import { afterPaint } from '../router.js';
 
@@ -39,12 +39,12 @@ function paint(el) {
     giftStats = html`
       <div class="row" style="gap:10px;margin-bottom:14px">
         <a class="card card-link grow" href="#/bucket" style="padding:12px 14px">
-          <div style="font-size:20px">🌠</div>
+          <div class="cat-badge" style="--c:var(--accent2)">${icon('star')}</div>
           <div style="font-weight:600;margin-top:4px">${wishes.length} ${wishes.length === 1 ? 'Rezept' : 'Rezepte'}</div>
           <div class="muted" style="font-size:13px">wollen wir noch kochen</div>
         </a>
         <div class="card grow" style="padding:12px 14px">
-          <div style="font-size:20px">🔁</div>
+          <div class="cat-badge" style="--c:var(--c-activity)">${icon('repeat')}</div>
           <div style="font-weight:600;margin-top:4px">${again} ${again === 1 ? 'Rezept' : 'Rezepte'}</div>
           <div class="muted" style="font-size:13px">kochen wir wieder</div>
         </div>
@@ -61,9 +61,9 @@ function paint(el) {
     giftStats = html`
       <div class="card" style="margin-bottom:14px">
         <div class="versus">
-          <div><b>${from('a').length}</b><span class="muted" style="font-size:13px">von ${nameOf('a')}</span>${recvAvg('a') != null ? html`<div class="faint" style="font-size:12px">Ø ${fmtRating(recvAvg('a'))} ♥</div>` : ''}</div>
+          <div><b>${from('a').length}</b><span class="muted" style="font-size:13px">von ${nameOf('a')}</span>${recvAvg('a') != null ? html`<div class="faint" style="font-size:12px">Ø ${fmtRating(recvAvg('a'))} Herzen</div>` : ''}</div>
           <div class="vs">vs.</div>
-          <div><b>${from('b').length}</b><span class="muted" style="font-size:13px">von ${nameOf('b')}</span>${recvAvg('b') != null ? html`<div class="faint" style="font-size:12px">Ø ${fmtRating(recvAvg('b'))} ♥</div>` : ''}</div>
+          <div><b>${from('b').length}</b><span class="muted" style="font-size:13px">von ${nameOf('b')}</span>${recvAvg('b') != null ? html`<div class="faint" style="font-size:12px">Ø ${fmtRating(recvAvg('b'))} Herzen</div>` : ''}</div>
         </div>
       </div>
       <div class="seg" style="margin-bottom:14px">
@@ -77,15 +77,15 @@ function paint(el) {
     ${topbar({ title: 'Erlebnisse', right: html`<button class="icon-btn" data-act="sort" aria-label="Sortieren">${icon('sort')}</button>` })}
     <div class="page">
       <h1 class="large-title">Erlebnisse</h1>
-      <p class="page-sub">${entries.length ? `${entries.length} gemeinsame Erinnerungen${avg != null && state.cat === 'all' ? ` · Ø ${fmtRating(avg)} ♥` : ''}` : 'Alles, was ihr zusammen erlebt habt'}</p>
+      <p class="page-sub">${entries.length ? `${entries.length} Einträge${avg != null && state.cat === 'all' ? ` · Ø ${fmtRating(avg)} Herzen` : ''}` : 'Alles, was ihr zusammen erlebt habt'}</p>
 
       <div class="group" style="margin-bottom:14px">
         <div class="cell" style="min-height:44px">${icon('search')}<input id="q" type="search" placeholder="Suchen …" value="${state.q}" autocomplete="off"></div>
       </div>
 
       <div class="chips" style="margin-bottom:16px">
-        <button class="chip ${state.cat === 'all' ? 'active' : ''}" data-cat="all">✨ Alle <span class="count">${entries.length}</span></button>
-        ${Object.values(CATEGORIES).map((c) => html`<button class="chip ${state.cat === c.key ? 'active' : ''}" data-cat="${c.key}">${c.emoji} ${c.plural} <span class="count">${counts[c.key]}</span></button>`)}
+        <button class="chip ${state.cat === 'all' ? 'active' : ''}" data-cat="all">Alle <span class="count">${entries.length}</span></button>
+        ${Object.values(CATEGORIES).map((c) => html`<button class="chip ${state.cat === c.key ? 'active' : ''}" data-cat="${c.key}">${catIcon(c)} ${c.plural} <span class="count">${counts[c.key]}</span></button>`)}
       </div>
 
       ${giftStats}
@@ -97,14 +97,14 @@ function paint(el) {
 
       <div id="list" class="entry-list">
         ${list.length ? list.map((e, i) => state.sort === 'rating' && i < 3 && avgRating(e) != null
-          ? html`<div style="position:relative">${entryCard(e)}<span style="position:absolute;top:-6px;left:-4px;font-size:20px">${['🥇', '🥈', '🥉'][i]}</span></div>`
+          ? html`<div style="position:relative">${entryCard(e)}<span class="rank-badge">${i + 1}</span></div>`
           : entryCard(e))
           : state.q
-            ? emptyState({ emoji: '🔍', title: 'Nichts gefunden', text: `Keine Erinnerung passt zu „${state.q}“.` })
+            ? emptyState({ icon: 'search', title: 'Nichts gefunden', text: `Nichts passt zu „${state.q}“.` })
             : emptyState({
-              emoji: cat?.emoji || '🌹',
+              icon: cat?.icon || 'sparkles',
               title: cat ? `Noch keine ${cat.plural}` : 'Noch keine Erlebnisse',
-              text: cat ? cat.hint : 'Fangt mit eurem letzten Date oder Lieblingsessen an.',
+              text: cat ? cat.hint : 'Fangt mit eurem letzten Date oder Restaurant an.',
               action: html`<button class="btn primary" data-act="add">${icon('plus')} ${cat ? cat.label : 'Erlebnis'} hinzufügen</button>`,
             })}
       </div>

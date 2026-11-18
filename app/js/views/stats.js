@@ -2,7 +2,8 @@
 import { html } from '../ui/dom.js';
 import { all, settings, nameOf } from '../store.js';
 import { CATEGORIES, avgRating, ratingValue, fmtRating, fmtNumber, daysBetween, today, fmtDate } from '../model.js';
-import { topbar, hearts, emptyState } from '../ui/components.js';
+import { topbar, hearts, emptyState, catBadge, catIcon } from '../ui/components.js';
+import { icon } from '../ui/icons.js';
 
 const MONTHS_SHORT = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
 const BEST_LABEL = { recipe: 'Bestes Rezept', food: 'Bestes Essen', date: 'Bestes Date', activity: 'Beste Aktivität', trip: 'Beste Reise', gift: 'Bestes Geschenk' };
@@ -24,7 +25,7 @@ export function render(el) {
   const agree = diff != null ? Math.round((1 - diff / 4.5) * 100) : null;
   let verdict = '';
   if (avgA != null && avgB != null) {
-    if (Math.abs(avgA - avgB) < 0.15) verdict = 'Ihr bewertet fast gleich – ein eingespieltes Team ♡';
+    if (Math.abs(avgA - avgB) < 0.15) verdict = 'Ihr bewertet fast gleich.';
     else verdict = `${nameOf(avgA < avgB ? 'a' : 'b')} bewertet strenger, ${nameOf(avgA < avgB ? 'b' : 'a')} großzügiger.`;
   }
 
@@ -58,8 +59,8 @@ export function render(el) {
   el.innerHTML = String(html`
     ${topbar({ title: 'Statistik', back: true })}
     <div class="page">
-      <h1 class="large-title">Unsere <em>Zahlen</em></h1>
-      <p class="page-sub">Liebe lässt sich nicht messen – aber ein bisschen zählen schon.</p>
+      <h1 class="large-title">Eure <em>Zahlen</em></h1>
+      <p class="page-sub">Alles, was ihr erlebt habt – in Zahlen.</p>
 
       <div class="stat-grid">
         <div class="stat"><b>${fmtNumber(entries.length)}</b><span>Erlebnisse</span></div>
@@ -70,7 +71,7 @@ export function render(el) {
         <div class="stat"><b>${wishes.filter((w) => w.data.done).length}/${wishes.length}</b><span>Wünsche</span></div>
       </div>
 
-      ${!entries.length ? html`<div class="section">${emptyState({ emoji: '📊', title: 'Noch keine Daten', text: 'Sobald ihr Erlebnisse bewertet, wird es hier spannend.' })}</div>` : html`
+      ${!entries.length ? html`<div class="section">${emptyState({ icon: 'chart', title: 'Noch keine Daten', text: 'Sobald ihr Erlebnisse bewertet, wird es hier spannend.' })}</div>` : html`
         <div class="section">
           <div class="section-head"><h2 class="section-title small">Wer bewertet strenger?</h2></div>
           <div class="card">
@@ -92,16 +93,16 @@ export function render(el) {
         </div>
 
         <div class="section">
-          <div class="section-head"><h2 class="section-title small">Was wir am liebsten machen</h2></div>
-          <div class="card">${catCounts.map(({ c, n }) => html`<div class="hbar"><span class="lbl">${c.emoji} ${c.plural}</span><span class="track"><i style="width:${(n / maxC) * 100}%"></i></span><span class="n">${n}</span></div>`)}</div>
+          <div class="section-head"><h2 class="section-title small">Was ihr am häufigsten macht</h2></div>
+          <div class="card">${catCounts.map(({ c, n }) => html`<div class="hbar"><span class="lbl">${catIcon(c)} ${c.plural}</span><span class="track"><i style="width:${(n / maxC) * 100}%"></i></span><span class="n">${n}</span></div>`)}</div>
         </div>
 
         ${tops.length ? html`
           <div class="section">
-            <div class="section-head"><h2 class="section-title small">Unsere Bestenliste</h2></div>
+            <div class="section-head"><h2 class="section-title small">Bestenliste</h2></div>
             <div class="entry-list">${tops.map(({ k, e }) => html`
               <a class="entry-card card-link" href="#/entry/${e.id}">
-                <div class="entry-thumb" style="width:56px;height:56px;font-size:26px">${CATEGORIES[k].emoji}</div>
+                <div class="entry-thumb" style="width:56px;height:56px">${catBadge(CATEGORIES[k], { size: 'fill' })}</div>
                 <div class="entry-body">
                   <div class="faint" style="font-size:12px;text-transform:uppercase;letter-spacing:.06em">${BEST_LABEL[k]}</div>
                   <div class="entry-title">${e.data.title}</div>
@@ -111,12 +112,12 @@ export function render(el) {
           </div>` : ''}
 
         <div class="section">
-          <div class="section-head"><h2 class="section-title small">Fleißige Herzen</h2></div>
+          <div class="section-head"><h2 class="section-title small">Wer trägt mehr ein?</h2></div>
           <div class="card">
-            <div class="hbar"><span class="lbl">✍️ ${nameOf('a')}</span><span class="track"><i style="width:${(byA / Math.max(1, byA + byB)) * 100}%"></i></span><span class="n">${byA}</span></div>
-            <div class="hbar"><span class="lbl">✍️ ${nameOf('b')}</span><span class="track"><i style="width:${(byB / Math.max(1, byA + byB)) * 100}%"></i></span><span class="n">${byB}</span></div>
-            <div class="hbar"><span class="lbl">🎁 ${nameOf('a')}</span><span class="track"><i style="width:${(giftsA / Math.max(1, giftsA + giftsB)) * 100}%"></i></span><span class="n">${giftsA}</span></div>
-            <div class="hbar"><span class="lbl">🎁 ${nameOf('b')}</span><span class="track"><i style="width:${(giftsB / Math.max(1, giftsA + giftsB)) * 100}%"></i></span><span class="n">${giftsB}</span></div>
+            <div class="hbar"><span class="lbl">${icon('edit')} ${nameOf('a')}</span><span class="track"><i style="width:${(byA / Math.max(1, byA + byB)) * 100}%"></i></span><span class="n">${byA}</span></div>
+            <div class="hbar"><span class="lbl">${icon('edit')} ${nameOf('b')}</span><span class="track"><i style="width:${(byB / Math.max(1, byA + byB)) * 100}%"></i></span><span class="n">${byB}</span></div>
+            <div class="hbar"><span class="lbl">${icon('gift')} ${nameOf('a')}</span><span class="track"><i style="width:${(giftsA / Math.max(1, giftsA + giftsB)) * 100}%"></i></span><span class="n">${giftsA}</span></div>
+            <div class="hbar"><span class="lbl">${icon('gift')} ${nameOf('b')}</span><span class="track"><i style="width:${(giftsB / Math.max(1, giftsA + giftsB)) * 100}%"></i></span><span class="n">${giftsB}</span></div>
             <p class="faint" style="font-size:12.5px;margin-top:8px">Einträge angelegt & Geschenke gemacht</p>
           </div>
         </div>`}

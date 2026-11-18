@@ -1,12 +1,12 @@
-// Timeline: Eure Geschichte ab dem ersten Tag – Meilensteine, Erlebnisse, automatische Jahrestage.
+// Timeline: alles ab Tag 1 – Meilensteine, Erlebnisse, automatische Jahrestage.
 import { html } from '../ui/dom.js';
 import { icon } from '../ui/icons.js';
 import { all, get, save, remove, settings, uuid } from '../store.js';
 import { CATEGORIES, MILESTONE_EMOJIS, fmtDate, fmtNumber, today, parseDate, isoDate, daysBetween, catOf, avgRating, fmtRange } from '../model.js';
-import { topbar, hearts, emptyState } from '../ui/components.js';
+import { topbar, hearts, emptyState, catBadge, catIcon } from '../ui/components.js';
 import { openSheet, confirmDialog, toast, actionSheet } from '../ui/sheet.js';
 import { processFiles, commitPhotos, discardPending, deletePhotos, photoUrl, coverOf } from '../photos.js';
-import { heartBurst } from '../ui/fx.js';
+import { sparkBurst } from '../ui/fx.js';
 import { afterPaint } from '../router.js';
 
 const MONTHS = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
@@ -26,14 +26,14 @@ function autoMarks(start) {
   for (let y = 1; y < 100; y++) {
     const d = isoDate(new Date(s.getFullYear() + y, s.getMonth(), s.getDate()));
     if (d > t) break;
-    out.push({ kind: 'auto', date: d, emoji: '🥂', text: `${y}. Jahrestag` });
+    out.push({ kind: 'auto', date: d, icon: 'ring', text: `${y}. Jahrestag` });
   }
   const total = daysBetween(start, t);
   for (const n of [100, 500, 1000, 1500, 2000, 2500, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000]) {
     if (n > total) break;
     const d = new Date(s);
     d.setDate(d.getDate() + n);
-    out.push({ kind: 'auto', date: isoDate(d), emoji: '✨', text: `${fmtNumber(n)} Tage zusammen` });
+    out.push({ kind: 'auto', date: isoDate(d), icon: 'sparkles', text: `${fmtNumber(n)} Tage zusammen` });
   }
   return out;
 }
@@ -55,7 +55,7 @@ function milestoneCard(m) {
   return html`
     <div class="tl-item milestone">
       <button class="tl-mile card-link" data-mile="${m.id}" style="width:100%;text-align:left">
-        <div class="row between"><span class="em">${d.emoji || '💞'}</span><span class="date">${fmtDate(d.date, { day: 'numeric', month: 'long', year: 'numeric' })}</span></div>
+        <div class="row between"><span class="em">${d.emoji || '⭐️'}</span><span class="date">${fmtDate(d.date, { day: 'numeric', month: 'long', year: 'numeric' })}</span></div>
         <h3>${d.title}</h3>
         ${d.text ? html`<p>${d.text}</p>` : ''}
         ${photos.length ? html`<div class="tl-photos">${photos.map((p) => html`<div class="ph-wrap"><img data-photo="${p}" data-size="thumb" alt=""></div>`)}</div>` : ''}
@@ -70,9 +70,9 @@ function entryItem(e) {
   return html`
     <div class="tl-item">
       <a class="tl-card card-link" href="#/entry/${e.id}">
-        <div class="tl-thumb">${cover ? html`<img data-photo="${cover}" data-size="thumb" alt="">` : c.emoji}</div>
+        <div class="tl-thumb">${cover ? html`<img data-photo="${cover}" data-size="thumb" alt="">` : catBadge(c, { size: 'fill' })}</div>
         <div class="grow">
-          <div class="date">${c.emoji} ${e.data.category === 'trip' ? fmtRange(e.data.date, e.data.endDate) : fmtDate(e.data.date, { day: 'numeric', month: 'long' })}</div>
+          <div class="date">${catIcon(c)} ${e.data.category === 'trip' ? fmtRange(e.data.date, e.data.endDate) : fmtDate(e.data.date, { day: 'numeric', month: 'long' })}</div>
           <div class="t">${e.data.title}</div>
           ${avg != null ? html`<div style="margin-top:3px">${hearts(avg)}</div>` : ''}
         </div>
@@ -84,27 +84,27 @@ function paint(el) {
   const s = settings();
   const items = collect();
   const filters = [
-    { key: 'milestone', label: '💞 Meilensteine' },
-    ...Object.values(CATEGORIES).map((c) => ({ key: c.key, label: `${c.emoji} ${c.plural}` })),
-    { key: 'auto', label: '🥂 Jahrestage' },
+    { key: 'milestone', label: 'Meilensteine', c: { icon: 'flag', color: 'var(--c-milestone)' } },
+    ...Object.values(CATEGORIES).map((c) => ({ key: c.key, label: c.plural, c })),
+    { key: 'auto', label: 'Jahrestage', c: { icon: 'ring', color: 'var(--purple)' } },
   ];
   let lastYear = null, lastMonth = null;
   const rows = [];
   const startNode = s.startDate ? html`
     <div class="tl-item start">
       <div class="tl-mile start-node">
-        <span class="em">💫</span>
-        <h3>Hier hat alles begonnen</h3>
+        <span class="em">${icon('flag')}</span>
+        <h3>Tag 1</h3>
         <div class="date">${fmtDate(s.startDate, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</div>
       </div>
     </div>` : '';
-  const nowNode = html`<div class="tl-now">Heute · ${fmtDate(today(), { day: 'numeric', month: 'long', year: 'numeric' })} ♡</div>`;
+  const nowNode = html`<div class="tl-now">Heute · ${fmtDate(today(), { day: 'numeric', month: 'long', year: 'numeric' })}</div>`;
 
   for (const x of items) {
     const y = String(x.date).slice(0, 4), m = +String(x.date).slice(5, 7);
     if (y !== lastYear) { rows.push(html`<div class="tl-year">${y}</div>`); lastYear = y; lastMonth = null; }
     if (m !== lastMonth) { rows.push(html`<div class="tl-month">${MONTHS[m - 1]}</div>`); lastMonth = m; }
-    if (x.kind === 'auto') rows.push(html`<div class="tl-item auto"><div class="tl-auto">${x.emoji} ${x.text} <span class="faint">· ${fmtDate(x.date, { day: 'numeric', month: 'short' })}</span></div></div>`);
+    if (x.kind === 'auto') rows.push(html`<div class="tl-item auto"><div class="tl-auto">${icon(x.icon)} ${x.text} <span class="faint">· ${fmtDate(x.date, { day: 'numeric', month: 'short' })}</span></div></div>`);
     else if (x.kind === 'milestone') rows.push(milestoneCard(x.it));
     else rows.push(entryItem(x.it));
   }
@@ -112,15 +112,15 @@ function paint(el) {
   el.innerHTML = String(html`
     ${topbar({ title: 'Timeline', right: html`<button class="icon-btn" data-act="add" aria-label="Meilenstein hinzufügen">${icon('plus')}</button>` })}
     <div class="page">
-      <h1 class="large-title">Unsere <em>Geschichte</em></h1>
-      <p class="page-sub">Von Anfang an – jeder Meilenstein, jedes Abenteuer.</p>
+      <h1 class="large-title"><em>Time</em>line</h1>
+      <p class="page-sub">Alles seit Tag 1.</p>
       <div class="seg" style="margin-bottom:12px">
         <button class="${state.order === 'asc' ? 'active' : ''}" data-order="asc">Von Anfang an</button>
         <button class="${state.order === 'desc' ? 'active' : ''}" data-order="desc">Neueste zuerst</button>
       </div>
-      <div class="chips">${filters.map((f) => html`<button class="chip ${state.hidden.has(f.key) ? '' : 'active'}" data-filter="${f.key}">${f.label}</button>`)}</div>
+      <div class="chips">${filters.map((f) => html`<button class="chip ${state.hidden.has(f.key) ? '' : 'active'}" data-filter="${f.key}">${catIcon(f.c)} ${f.label}</button>`)}</div>
 
-      ${!s.startDate && !items.length ? emptyState({ emoji: '💞', title: 'Eure Timeline', text: 'Tragt in den Einstellungen ein, seit wann ihr zusammen seid, und fügt Meilensteine hinzu.' }) : html`
+      ${!s.startDate && !items.length ? emptyState({ icon: 'timeline', title: 'Noch leer', text: 'Tragt in den Einstellungen ein, seit wann ihr zusammen seid, und legt Meilensteine an.' }) : html`
         <div class="tl">
           ${state.order === 'asc' ? startNode : nowNode}
           ${rows}
@@ -173,7 +173,7 @@ export function openMilestoneForm({ id = null } = {}) {
   const existing = id ? get(id) : null;
   const st = {
     id: existing?.id || uuid(),
-    emoji: existing?.data.emoji || '💞',
+    emoji: existing?.data.emoji || '⭐️',
     title: existing?.data.title || '',
     date: existing?.data.date || today(),
     text: existing?.data.text || '',
@@ -194,10 +194,10 @@ export function openMilestoneForm({ id = null } = {}) {
           <div class="group-label">Symbol</div>
           <div class="opt-row" id="emojis">${MILESTONE_EMOJIS.map((e) => html`<button type="button" class="opt ${e === st.emoji ? 'active' : ''}" data-emoji="${e}" style="font-size:22px;padding:6px 10px">${e}</button>`)}</div>
         </div>
-        <input class="title-input" id="mt" placeholder="z. B. Unser erster Kuss" value="${st.title}" maxlength="120">
+        <input class="title-input" id="mt" placeholder="z. B. Erste gemeinsame Wohnung" value="${st.title}" maxlength="120">
         <div class="group">
           <div class="cell"><label>Datum</label><input type="date" id="md" value="${st.date}"></div>
-          <div class="cell col"><textarea id="mx" rows="4" placeholder="Erzählt die Geschichte dazu …">${st.text}</textarea></div>
+          <div class="cell col"><textarea id="mx" rows="4" placeholder="Was ist passiert?">${st.text}</textarea></div>
         </div>
         <div>
           <div class="group-label">Fotos</div>
@@ -244,8 +244,8 @@ export function openMilestoneForm({ id = null } = {}) {
       await save('milestone', { emoji: st.emoji, title: st.title, date: st.date, text: st.text, photoIds: [...st.photoIds, ...committed.map((c) => c.id)] }, { id: st.id });
       saved = true;
       const r = t.getBoundingClientRect();
-      heartBurst(r.left + r.width / 2, r.top + r.height / 2, 12);
-      toast('Meilenstein gespeichert', { emoji: st.emoji });
+      sparkBurst(r.left + r.width / 2, r.top + r.height / 2, 12);
+      toast('Meilenstein gespeichert', { icon: 'flag' });
       sheet.close(undefined, true);
     }
   });

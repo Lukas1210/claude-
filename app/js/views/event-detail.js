@@ -4,7 +4,7 @@ import { icon } from '../ui/icons.js';
 import { get, update, remove, nameOf, me } from '../store.js';
 import { fmtDate } from '../model.js';
 import { eventCat, fmtWhen, repeatLabel, reminderLabel, RSVP, countdownText, occStart, toICS, icsFileName, ENTRY_CATEGORY_FOR, occurrencesInRange } from '../events.js';
-import { emptyState } from '../ui/components.js';
+import { emptyState, catIcon } from '../ui/components.js';
 import { actionSheet, confirmDialog, toast } from '../ui/sheet.js';
 import { placeLabel } from '../geo.js';
 import { back } from '../router.js';
@@ -65,8 +65,8 @@ export function render(el, { id }, query) {
         <button class="text-btn" data-act="edit">Bearbeiten</button>
       </div>
 
-      <div class="event-hero" style="background:${c.color};background:linear-gradient(135deg, ${c.color}, color-mix(in srgb, ${c.color} 72%, #000))">
-        <div class="cat">${c.emoji} ${c.label}</div>
+      <div class="event-hero" style="--c:${c.color}">
+        <div class="cat">${catIcon(c)} ${c.label}</div>
         <h1>${d.title}</h1>
         <div class="when">${fmtWhen(ev, occ)}</div>
         ${recurring ? html`<div class="rep">↻ ${repeatLabel(d.repeat)}${d.repeatUntil ? ` bis ${fmtDate(d.repeatUntil)}` : ''}</div>` : ''}

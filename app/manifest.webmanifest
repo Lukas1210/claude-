@@ -1,15 +1,15 @@
 {
   "name": "Couple Journal",
   "short_name": "Couple Journal",
-  "description": "Unser gemeinsames Tagebuch – Erlebnisse, Termine, Reisen, Fotos und Erinnerungen.",
+  "description": "Euer gemeinsames Journal – Erlebnisse bewerten, Termine planen, Reisen auf dem Globus.",
   "lang": "de",
   "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#f2f2f7",
-  "theme_color": "#f2f2f7",
+  "background_color": "#F2F4F9",
+  "theme_color": "#F2F4F9",
   "categories": [
     "lifestyle",
     "photo"

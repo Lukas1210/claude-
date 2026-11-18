@@ -65,9 +65,9 @@ function collectPlaces() {
 export function render(el, _params, query) {
   const s = settings();
   el.innerHTML = String(html`
-    ${topbar({ title: 'Unsere Welt' })}
+    ${topbar({ title: 'Unterwegs' })}
     <div class="page globe-page">
-      <h1 class="large-title">Unsere <em>Welt</em></h1>
+      <h1 class="large-title"><em>Unterwegs</em></h1>
       <div class="globe-wrap" id="gw">
         <canvas id="gc" aria-label="Globus mit euren Orten"></canvas>
         <div class="globe-tools">
@@ -168,9 +168,9 @@ export function render(el, _params, query) {
     const list = [...byCountry.values()].sort((a, b) => b.places.reduce((n, p) => n + p.entries.length, 0) - a.places.reduce((n, p) => n + p.entries.length, 0));
     const box = el.querySelector('#gl');
     box.innerHTML = String(!places.length
-      ? html`<div class="card center" style="padding:22px"><div style="font-size:40px">🗺️</div><h3 class="serif" style="font-size:20px;margin:6px 0">Euer Globus wartet</h3><p class="muted">Gebt euren Erlebnissen einen Ort – dann leuchten hier eure Länder, und Bögen zeigen eure Reisen.</p></div>`
+      ? html`<div class="card center" style="padding:22px"><div class="empty" style="padding:6px 0 0"><span class="em-ico">${icon('map')}</span></div><h3 class="display" style="font-size:21px;margin:0 0 6px">Noch keine Orte</h3><p class="muted">Gebt euren Erlebnissen einen Ort – dann leuchten hier eure Länder, und Bögen zeigen eure Reisen.</p></div>`
       : html`
-        <div class="section-head"><h2 class="section-title small">Wo wir schon waren</h2></div>
+        <div class="section-head"><h2 class="section-title small">Besuchte Länder</h2></div>
         <div class="country-list">
           ${list.map((c) => html`
             <button class="country" data-fly="${c.places[0].key}" style="width:100%;text-align:left">
@@ -218,6 +218,7 @@ export function render(el, _params, query) {
     return {
       ocean: v('--globe-ocean'), ocean2: v('--globe-ocean2'), land: v('--globe-land'), border: v('--globe-border'),
       grid: v('--globe-grid'), glow: v('--globe-glow'), accent: v('--accent'), accent2: v('--accent2'),
+      visited: v('--globe-visited'), arc: v('--globe-arc'), marker: v('--globe-marker'), markerText: v('--globe-marker-text'), home: v('--globe-home'), brandRgb: v('--brand-rgb') || '0, 0, 0',
       dark: cs.colorScheme === 'dark' || v('color-scheme') === 'dark',
     };
   }
@@ -264,7 +265,7 @@ export function render(el, _params, query) {
     if (visited.size) {
       ctx.beginPath();
       for (const f of data.countries) if (visited.has(String(f.id ?? f.properties.name))) path(f);
-      ctx.fillStyle = pal.accent;
+      ctx.fillStyle = pal.visited;
       ctx.fill();
     }
 
@@ -298,11 +299,15 @@ export function render(el, _params, query) {
         if (pt.visible) { pen ? ctx.lineTo(pt.X, pt.Y) : ctx.moveTo(pt.X, pt.Y); pen = true; }
         else pen = false;
       }
-      ctx.strokeStyle = pal.accent2;
+      ctx.save();
+      if (pal.dark) { ctx.shadowColor = `rgba(${pal.brandRgb}, 0.6)`; ctx.shadowBlur = 6; }
+      ctx.strokeStyle = pal.arc;
+      ctx.globalAlpha = pal.dark ? 0.9 : 0.7;
       ctx.lineWidth = 1.6;
       ctx.setLineDash([6, 5]);
       ctx.lineDashOffset = -dash;
       ctx.stroke();
+      ctx.restore();
       ctx.setLineDash([]);
     }
 
@@ -313,8 +318,8 @@ export function render(el, _params, query) {
       const p = project3d(rot, home.lng, home.lat);
       if (p.z > 0) {
         ctx.beginPath(); ctx.arc(p.X, p.Y, 6, 0, Math.PI * 2);
-        ctx.fillStyle = pal.accent2; ctx.fill();
-        ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.stroke();
+        ctx.fillStyle = pal.home; ctx.fill();
+        ctx.lineWidth = 2; ctx.strokeStyle = pal.dark ? '#0b0b0c' : '#fff'; ctx.stroke();
       }
     }
 
@@ -329,28 +334,31 @@ export function render(el, _params, query) {
         ctx.beginPath();
         ctx.arc(pt.X, pt.Y, 14 + pulse * 10, 0, Math.PI * 2);
         ctx.globalAlpha = fade * (0.3 - pulse * 0.25);
-        ctx.fillStyle = pal.accent;
+        ctx.fillStyle = pal.marker;
         ctx.fill();
         ctx.globalAlpha = fade;
       }
-      const size = (p.trip ? 20 : 15) * (isSel ? 1.25 : 1) * Math.min(1.3, 0.85 + zoom * 0.15);
+      const multi = p.entries.length > 1;
+      const size = (p.trip ? 21 : 16) * (multi ? 1.08 : 1) * (isSel ? 1.25 : 1) * Math.min(1.3, 0.85 + zoom * 0.15);
       ctx.save();
-      ctx.shadowColor = 'rgba(0,0,0,0.3)';
-      ctx.shadowBlur = 4;
-      ctx.shadowOffsetY = 1;
+      ctx.shadowColor = pal.dark ? `rgba(${pal.brandRgb}, 0.55)` : 'rgba(0,0,0,0.3)';
+      ctx.shadowBlur = pal.dark ? 10 : 4;
+      ctx.shadowOffsetY = pal.dark ? 0 : 1;
       heartPath(ctx, pt.X, pt.Y, size);
-      ctx.fillStyle = pal.accent;
+      ctx.fillStyle = pal.marker;
       ctx.fill();
       ctx.restore();
       heartPath(ctx, pt.X, pt.Y, size);
-      ctx.strokeStyle = '#fff';
+      ctx.strokeStyle = pal.dark ? 'rgba(0,0,0,0.6)' : '#fff';
       ctx.lineWidth = 1.4;
       ctx.stroke();
-      if (p.entries.length > 1) {
-        ctx.font = '700 10px -apple-system, sans-serif';
-        ctx.fillStyle = '#fff';
+      if (multi) {
+        ctx.font = `700 ${Math.round(size * 0.46)}px 'Space Grotesk', -apple-system, sans-serif`;
+        ctx.fillStyle = pal.markerText;
         ctx.textAlign = 'center';
-        ctx.fillText(String(p.entries.length), pt.X, pt.Y + 1);
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(p.entries.length), pt.X, pt.Y - size * 0.04);
+        ctx.textBaseline = 'alphabetic';
       }
       ctx.globalAlpha = 1;
       tapTargets.push({ p, x: pt.X, y: pt.Y });
@@ -523,7 +531,7 @@ export function render(el, _params, query) {
       detailDrawn = false;
     });
   }).catch((err) => {
-    wrap.innerHTML = String(html`<div class="empty"><span class="em">🌍</span><h3>Globus nicht verfügbar</h3><p>${err.message}</p></div>`);
+    wrap.innerHTML = String(html`<div class="empty"><span class="em-ico">${icon('globe')}</span><h3>Globus nicht verfügbar</h3><p>${err.message}</p></div>`);
   });
 
   return () => {

@@ -6,18 +6,20 @@ const CACHE = `cj-${BUILD}`;
 // App-Hülle: wird bei der Installation vollständig geladen
 const CORE = [
   './',
+  'assets/geo/countries-110m.json',
   'assets/icons/apple-touch-icon.png',
   'assets/icons/icon-192.png',
   'assets/icons/icon-512.png',
   'assets/icons/icon.svg',
-  'assets/geo/countries-110m.json',
   'config.js',
   'css/app.css',
+  'css/palettes.css',
   'index.html',
   'js/db.js',
   'js/events.js',
   'js/exif.js',
   'js/geo.js',
+  'js/insights.js',
   'js/main.js',
   'js/model.js',
   'js/photos.js',
@@ -51,6 +53,7 @@ const CORE = [
   'manifest.webmanifest',
   'vendor/d3-array.min.js',
   'vendor/d3-geo.min.js',
+  'vendor/fonts/space-grotesk-latin.woff2',
   'vendor/topojson-client.min.js',
 ];
 
