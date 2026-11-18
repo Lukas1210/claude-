@@ -5,7 +5,7 @@
 //          node tools/e2e/run.cjs tour             → Screenshot-Rundgang (tools/e2e/shots/)
 const { startServer, makeChecker } = require('./lib.cjs');
 
-const ALL = ['flows', 'calendar', 'recipes', 'planner', 'extras', 'awards'];
+const ALL = ['flows', 'calendar', 'recipes', 'planner', 'extras', 'awards', 'fun'];
 
 (async () => {
   const names = process.argv.slice(2).length ? process.argv.slice(2) : ALL;

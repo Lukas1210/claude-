@@ -207,6 +207,7 @@ export async function syncNow({ silent = false } = {}) {
       await metaDB.set('lastSync', status.lastSync);
       const interesting = fromPartner.filter((r) => ['entry', 'milestone', 'letter', 'wish', 'event'].includes(r.type));
       const photos = fromPartner.filter((r) => r.type === 'photo').length;
+      if (!silent && fromPartner.some((r) => r.type === 'votes')) import('./views/match.js').then((m) => m.notifyNewMatches()).catch(() => {});
       // Listen: neue Aufgaben für mich und neue Einkaufs-Punkte des Partners (jeweils nur einmal melden)
       const seen = new Set(getDevice().seenTodos || []);
       const todoRows = fromPartner.filter((r) => r.type === 'todo' && !r.deleted && !r.data?.done && !seen.has(r.id));

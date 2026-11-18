@@ -283,11 +283,17 @@ export function render(el, { id }) {
       case 'more': {
         const v = await actionSheet({
           items: [
+            { label: 'Als Bild teilen', icon: 'share', value: 'share' },
             { label: d.favorite ? 'Kein Favorit mehr' : 'Als Favorit markieren', icon: 'star', value: 'fav' },
             ...(d.place?.lat != null ? [{ label: 'Auf dem Globus zeigen', icon: 'globe', value: 'globe' }] : []),
             { label: 'Löschen', icon: 'trash', value: 'delete', danger: true },
           ],
         });
+        if (v === 'share') {
+          const { entryImage, openShareSheet } = await import('../share-image.js');
+          const cur = get(entry.id);
+          openShareSheet(entryImage(cur), { filename: `${(cur.data.title || 'erlebnis').replace(/[^\wäöüÄÖÜß-]+/g, '-').slice(0, 40)}.jpg`, title: cur.data.title });
+        }
         if (v === 'fav') await update(entry.id, { favorite: !d.favorite });
         if (v === 'globe') go(`/globe?focus=${entry.id}`);
         if (v === 'delete') {

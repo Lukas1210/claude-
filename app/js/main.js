@@ -26,6 +26,8 @@ const views = {
   wishlist: () => import('./views/wishlist.js'),
   duel: () => import('./views/duel.js'),
   awards: () => import('./views/awards.js'),
+  match: () => import('./views/match.js'),
+  wrapped: () => import('./views/wrapped.js'),
 };
 
 route('/', views.home, { tab: 'home', root: true });
@@ -45,6 +47,8 @@ route('/lists', views.lists, { tab: 'home', fab: false });
 route('/wishlist', views.wishlist, { tab: 'home', fab: false });
 route('/duel', views.duel, { tab: 'home', fab: false });
 route('/achievements', views.awards, { tab: 'home', fab: false });
+route('/match', views.match, { tab: 'home', fab: false });
+route('/wrapped', views.wrapped, { tab: 'home', fab: false });
 
 const TAB_DEF = [
   { tab: 'home', path: '/', label: 'Wir', icon: 'home' },

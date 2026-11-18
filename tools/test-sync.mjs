@@ -211,7 +211,16 @@ await A.sync();
 const doneOn = (dev) => dev.run(async (ids) => { const S = await import('./js/store.js'); return ids.map((id) => S.get(id).data.done).join(','); }, todoIds.slice(1));
 check('Gleichzeitig abgehakt: beide Einkäufe auf beiden Geräten erledigt', (await doneOn(A)) === 'true,true' && (await doneOn(B)) === 'true,true');
 
-// 9) Zweiter Sync ohne Änderungen überträgt nichts
+// 9) Swipe-Match: beide stimmen auf getrennten Geräten für dieselbe Idee → Match auf beiden
+await A.run(async () => { await (await import('./js/views/match.js')).vote('a', 'idea:escape', 1); await (await import('./js/views/match.js')).vote('a', 'idea:bowling', 1); });
+await B.run(async () => { const S = await import('./js/store.js'); await S.setDevice({ me: 'b', onboarded: true }); await (await import('./js/views/match.js')).vote('b', 'idea:escape', 1); await (await import('./js/views/match.js')).vote('b', 'idea:bowling', -1); });
+await A.sync();
+await B.sync();
+await A.sync();
+const matchIds = (dev) => dev.run(async () => (await import('./js/views/match.js')).matches().map((i) => i.id).join(','));
+check('Match auf beiden Geräten (nur Escape Room)', (await matchIds(A)) === 'idea:escape' && (await matchIds(B)) === 'idea:escape', `${await matchIds(A)} / ${await matchIds(B)}`);
+
+// 10) Zweiter Sync ohne Änderungen überträgt nichts
 r = await B.sync();
 check('Leerlauf-Sync überträgt nichts', r.pushed === 0 && r.fromPartner === 0, JSON.stringify(r));
 

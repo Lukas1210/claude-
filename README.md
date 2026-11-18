@@ -4,6 +4,8 @@ Euer gemeinsames Journal fürs iPhone: Dates, Aktivitäten, Essen, selbst gekoch
 
 ![Couple Journal – Startseite, Kalender, Termin, Globus, Erlebnisse und Detail in hell und dunkel](docs/screenshots.jpg)
 
+![Neue Funktionen: Zufalls-Date, Date-Hinweis, Listen, Wunschzettel, Duell, Erfolge, Swipe-Match und Rückblick](docs/features.jpg)
+
 ## Funktionen
 
 | | |
@@ -25,6 +27,9 @@ Euer gemeinsames Journal fürs iPhone: Dates, Aktivitäten, Essen, selbst gekoch
 | **Statistik** | Eure Zahlen, Bestenlisten und eure Aktivität pro Monat. |
 | **Geschmacks-Duell & Rangliste** | Wie einig seid ihr euch (in %), wer bewertet strenger, eure Lieblingskategorien und die umstrittensten Erlebnisse. Dazu eine **Rangliste** von S bis D – insgesamt oder pro Kategorie. |
 | **Erfolge & Serien** | 18 Abzeichen in Bronze, Silber und Gold (Länder, Kilometer, Restaurants, Rezepte, Filme, Fotos, „Ein Herz und eine Seele“ …) und eure Serie: Monate in Folge mit mindestens einem Erlebnis. Neue Stufen werden mit Konfetti gemeldet. |
+| **Swipe-Match** | Jeder wischt für sich durch Ideen (eingebaute Date-Ideen, Bucket-Liste, Watchlist, Lieblingsorte). Wischt ihr beide nach rechts, gibt es ein **Match** – mit „Gleich planen“. Ohne Sync: Handy weitergeben. |
+| **Rückblick** | Euer Jahr (oder alles) als **Story** im Vollbild: Zahlen, Kategorien, Highlight mit Foto, Reisen, Essen & Rezepte, Filme, Duell und stärkster Monat. Am Ende als Bild teilbar. |
+| **Als Bild teilen** | Jedes Erlebnis wird zum Story-Bild (1080 × 1920) mit Foto, Titel, Datum, Ort und euren Herzen – für Instagram, WhatsApp oder AirDrop. |
 | **Farbwelten** | Nachtblau & Gold (Standard), Petrol & Koralle, Indigo, Polaroid oder Schwarz & Neon – unter Einstellungen → Farbwelt, für jedes iPhone einzeln. „Automatisch“ folgt dem Hell-/Dunkelmodus des iPhones. |
 | **Sync & offline** | Beide iPhones sehen dieselben Daten. Die App funktioniert ohne Netz und überträgt Änderungen später. Dazu gibt es ein Backup als Datei. |
 

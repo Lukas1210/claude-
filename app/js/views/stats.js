@@ -67,6 +67,7 @@ export function render(el) {
         <a class="btn small grow" href="#/duel?tab=tiers">${icon('trophy')} Rangliste</a>
         <a class="btn small grow" href="#/achievements">${icon('flame')} Erfolge</a>
       </div>
+      <a class="btn primary block" href="#/wrapped" style="margin-bottom:14px">${icon('play')} Rückblick ansehen</a>
       <div class="stat-grid">
         <div class="stat"><b>${fmtNumber(entries.length)}</b><span>Erlebnisse</span></div>
         <div class="stat"><b>${fmtNumber(photos.length)}</b><span>Fotos</span></div>

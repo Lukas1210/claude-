@@ -273,6 +273,8 @@ export function render(el) {
       <div class="section">
         <div class="section-head"><h2 class="section-title">Entdecken</h2></div>
         <div class="h-scroll discover">
+          <a class="disc card-link" href="#/wrapped"><span class="cat-badge lg" style="--c:var(--accent-ink)">${icon('play')}</span><b>Rückblick</b><span>Euer Jahr als Story</span></a>
+          <a class="disc card-link" href="#/match"><span class="cat-badge lg" style="--c:var(--c-gift)">${icon('cards')}</span><b>Swipe-Match</b><span>Beide wischen – Match planen</span></a>
           <a class="disc card-link" href="#/ideas"><span class="cat-badge lg" style="--c:var(--accent2)">${icon('dice')}</span><b>Zufalls-Date</b><span>Würfeln: Was machen wir?</span></a>
           <a class="disc card-link" href="#/duel"><span class="cat-badge lg" style="--c:var(--c-date)">${icon('swords')}</span><b>Duell</b><span>${rs.agreement != null && rs.both ? `${rs.agreement} % einig` : 'Wer bewertet strenger?'}</span></a>
           <a class="disc card-link" href="#/duel?tab=tiers"><span class="cat-badge lg" style="--c:var(--c-trip)">${icon('trophy')}</span><b>Rangliste</b><span>Von S bis D</span></a>
