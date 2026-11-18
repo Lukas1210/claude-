@@ -114,7 +114,10 @@ export function entryCard(entry) {
   const avg = avgRating(entry);
   const meta = [d.category === 'trip' ? fmtRange(d.date, d.endDate) : fmtDate(d.date)];
   if (d.category === 'gift') { const g = giftLine(entry); if (g) meta.push(g); }
-  else if (d.category === 'recipe') {
+  else if (d.category === 'movie') {
+    if (d.extra?.kind) meta.push(d.extra.kind.replace(/^\S+\s/, ''));
+    if (d.extra?.platform) meta.push(d.extra.platform);
+  } else if (d.category === 'recipe') {
     if (d.extra?.course) meta.push(d.extra.course.replace(/^\S+\s/, ''));
     if (d.extra?.time) meta.push(`${d.extra.time} Min.`);
   } else if (d.place) meta.push(shortPlace(d.place));

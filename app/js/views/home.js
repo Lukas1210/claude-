@@ -280,6 +280,7 @@ export function render(el) {
         <div class="card-grid">
           ${tile('#/ideas', 'dice', 'var(--accent2)', 'Date-Ideen', 'Würfeln: Was machen wir?')}
           ${tile('#/lists', 'todo', 'var(--c-trip)', 'Listen', todoOpen || shopOpen ? `${todoOpen} To-dos · ${shopOpen} Einkauf` : 'To-dos & Einkauf')}
+          ${tile('#/wishlist', 'gift', 'var(--c-gift)', 'Wunschzettel', (() => { const n = all('giftwish').filter((w) => w.data.owner !== me()).length; return n ? `${n} ${n === 1 ? 'Wunsch' : 'Wünsche'} von ${partnerName}` : 'Wünsche & geheime Ideen'; })())}
           ${tile('#/bucket', 'star', 'var(--accent2)', 'Bucket-Liste', wishes.length ? `${wishDone} von ${wishes.length} erledigt` : 'Was ihr noch machen wollt')}
           ${tile('#/letters', 'letter', 'var(--purple)', 'Briefe', letters.length ? `${letters.length} ${letters.length === 1 ? 'Brief' : 'Briefe'}` : 'Zeitkapseln & Nachrichten', unread ? html`<span class="badge">${unread}</span>` : '')}
           ${tile('#/stats', 'chart', 'var(--c-trip)', 'Statistik', 'Wer bewertet strenger?')}

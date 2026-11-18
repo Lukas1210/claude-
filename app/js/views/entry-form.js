@@ -18,6 +18,7 @@ const TITLE_HINT = {
   trip: 'Wohin ging die Reise?',
   gift: 'Was war das Geschenk?',
   recipe: 'Welches Gericht habt ihr gekocht?',
+  movie: 'Welcher Film, welche Serie?',
 };
 
 export function openEntryForm({ category = 'date', id = null, prefill = {}, wishId = null, onSaved = null } = {}) {
@@ -139,7 +140,7 @@ export function openEntryForm({ category = 'date', id = null, prefill = {}, wish
 
         <div>
           <div class="group">
-            <div class="cell"><label>${st.category === 'trip' ? 'Von' : st.category === 'recipe' ? 'Gekocht am' : 'Datum'}</label><input type="date" id="date" value="${st.date}"></div>
+            <div class="cell"><label>${st.category === 'trip' ? 'Von' : st.category === 'recipe' ? 'Gekocht am' : st.category === 'movie' ? 'Geschaut am' : 'Datum'}</label><input type="date" id="date" value="${st.date}"></div>
             ${st.category === 'trip' ? html`<div class="cell"><label>Bis</label><input type="date" id="endDate" value="${st.endDate}" min="${st.date}"></div>` : ''}
             ${!CATEGORIES[st.category].noPlace ? html`<button type="button" class="cell link" id="place-cell" data-act="place" style="width:100%;text-align:left"></button>` : ''}
           </div>

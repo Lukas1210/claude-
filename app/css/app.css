@@ -1284,3 +1284,11 @@ img[data-photo].loaded { opacity: 1; }
 .who.partner { background: var(--accent2-soft); color: var(--accent2); box-shadow: inset 0 0 0 1.5px var(--accent2); }
 .who.both { background: var(--fill); color: var(--text2); }
 .ing.pick.on .ck { background: var(--primary-bg); border-color: transparent; color: var(--primary-fg); }
+
+/* ---------- Wunschzettel ---------- */
+.gw-list { display: flex; flex-direction: column; gap: 8px; }
+.gw { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 14px; border-radius: var(--radius-md); background: var(--bg-elev); border: 0.5px solid var(--card-border); box-shadow: var(--card-shadow); color: var(--text); min-height: 60px; }
+.gw-title { display: block; font-weight: 600; font-size: 16px; line-height: 1.25; }
+.gw-sub { display: block; font-size: 13px; color: var(--text2); margin-top: 2px; }
+.gw-res { display: block; font-size: 12.5px; color: var(--ok); font-weight: 600; margin-top: 3px; }
+.gw.res .gw-title { color: var(--text2); }

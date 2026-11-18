@@ -38,7 +38,7 @@ function paint(el) {
     const again = entries.filter((e) => e.data.category === 'recipe' && e.data.extra?.again === 'yes').length;
     giftStats = html`
       <div class="row" style="gap:10px;margin-bottom:14px">
-        <a class="card card-link grow" href="#/bucket" style="padding:12px 14px">
+        <a class="card card-link grow" href="#/bucket?cat=recipe" style="padding:12px 14px">
           <div class="cat-badge" style="--c:var(--accent2)">${icon('star')}</div>
           <div style="font-weight:600;margin-top:4px">${wishes.length} ${wishes.length === 1 ? 'Rezept' : 'Rezepte'}</div>
           <div class="muted" style="font-size:13px">wollen wir noch kochen</div>
@@ -50,6 +50,24 @@ function paint(el) {
         </div>
       </div>`;
   }
+  if (state.cat === 'movie') {
+    const watch = all('wish').filter((w) => w.data.category === 'movie' && !w.data.done);
+    const rec = entries.filter((e) => e.data.category === 'movie' && e.data.extra?.again === 'yes').length;
+    giftStats = html`
+      <div class="row" style="gap:10px;margin-bottom:10px">
+        <a class="card card-link grow" href="#/bucket?cat=movie" style="padding:12px 14px">
+          <div class="cat-badge" style="--c:var(--c-movie)">${icon('bookmark')}</div>
+          <div style="font-weight:600;margin-top:4px">${watch.length} auf der Watchlist</div>
+          <div class="muted" style="font-size:13px">wollt ihr noch schauen</div>
+        </a>
+        <div class="card grow" style="padding:12px 14px">
+          <div class="cat-badge" style="--c:var(--accent2)">${icon('star')}</div>
+          <div style="font-weight:600;margin-top:4px">${rec} empfehlenswert</div>
+          <div class="muted" style="font-size:13px">würdet ihr weitersagen</div>
+        </div>
+      </div>
+      ${watch.length ? html`<button class="btn primary block" data-act="watch-pick" style="margin-bottom:14px">${icon('dice')} Was schauen wir heute?</button>` : ''}`;
+  }
   if (state.cat === 'gift') {
     const gifts = entries.filter((e) => e.data.category === 'gift');
     const from = (s) => gifts.filter((g) => g.data.extra?.from === s);
@@ -59,6 +77,7 @@ function paint(el) {
       return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
     };
     giftStats = html`
+      <a class="notice card-link" href="#/wishlist" style="margin:0 0 12px"><span class="cat-badge" style="--c:var(--c-gift)">${icon('gift')}</span><span class="grow">Wunschzettel & geheime Ideen</span><span class="faint">${icon('chevron')}</span></a>
       <div class="card" style="margin-bottom:14px">
         <div class="versus">
           <div><b>${from('a').length}</b><span class="muted" style="font-size:13px">von ${nameOf('a')}</span>${recvAvg('a') != null ? html`<div class="faint" style="font-size:12px">Ø ${fmtRating(recvAvg('a'))} Herzen</div>` : ''}</div>
@@ -117,8 +136,8 @@ function paint(el) {
   if (chips && act) chips.scrollLeft = Math.max(0, act.offsetLeft - chips.clientWidth / 2 + act.clientWidth / 2);
 }
 
-export function render(el, _p, query) {
-  if (query?.cat && (CATEGORIES[query.cat] || query.cat === 'all')) state.cat = query.cat;
+export function render(el, _p, query, opts = {}) {
+  if (!opts.refresh && query?.cat && (CATEGORIES[query.cat] || query.cat === 'all')) state.cat = query.cat;
   paint(el);
   const onClick = async (e) => {
     const t = e.target.closest('[data-cat], [data-act], [data-gf]');
@@ -126,6 +145,7 @@ export function render(el, _p, query) {
     if (t.dataset.cat) { state.cat = t.dataset.cat; persist(); paint(el); return; }
     if (t.dataset.gf) { state.giftFrom = t.dataset.gf; persist(); paint(el); return; }
     if (t.dataset.act === 'add') openEntryForm({ category: state.cat === 'all' ? 'date' : state.cat });
+    if (t.dataset.act === 'watch-pick') { const { surprise } = await import('./bucket.js'); surprise('movie'); }
     if (t.dataset.act === 'sort') {
       state.sort = state.sort === 'date' ? 'rating' : 'date';
       persist();

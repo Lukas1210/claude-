@@ -67,7 +67,7 @@ exports.run = async ({ server, check }) => {
     const plannedTitle = (await p.textContent('.plan-idea-title')).trim();
     await p.click('.sheet [data-act="go"]'); await p.waitForTimeout(900);
     const formTitle = await p.inputValue('#et');
-    check('Terminformular mit Idee & Tag vorausgefüllt', formTitle === plannedTitle.replace(/^(Wieder hin|Nochmal kochen): /, '') && (await p.inputValue('#sd')) === tomorrow, `${formTitle} · ${await p.inputValue('#sd')}`);
+    check('Terminformular mit Idee & Tag vorausgefüllt', formTitle === plannedTitle.replace(/^(Wieder hin|Nochmal kochen|Schauen): /, '') && (await p.inputValue('#sd')) === tomorrow, `${formTitle} · ${await p.inputValue('#sd')}`);
     await p.click('.sheet [data-act="save"]'); await p.waitForTimeout(900);
     const planned = await S(async (t) => (await import('./js/store.js')).all('event').find((e) => e.data.title === t), formTitle);
     check('Date als Termin gespeichert', !!planned && planned.data.date === tomorrow, planned && `${planned.data.category} ${planned.data.time}`);

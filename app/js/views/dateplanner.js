@@ -87,7 +87,7 @@ export function openDatePlanner({ idea = null, date = null, slot = null, filters
         if (!i || !when) return;
         sheet.close();
         const { openEventForm } = await import('./event-form.js');
-        openEventForm({ prefill: { title: i.title.replace(/^(Wieder hin|Nochmal kochen): /, ''), category: i.cat || 'date', date: when.date, time: when.start, place: i.place || null, notes: i.source === 'library' ? i.text : '' } });
+        openEventForm({ prefill: { title: i.title.replace(/^(Wieder hin|Nochmal kochen|Schauen): /, ''), category: i.cat || 'date', date: when.date, time: when.start, place: i.place || null, notes: i.source === 'library' ? i.text : '' } });
         break;
       }
     }

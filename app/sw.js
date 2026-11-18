@@ -55,6 +55,7 @@ const CORE = [
   'js/views/settings.js',
   'js/views/stats.js',
   'js/views/timeline.js',
+  'js/views/wishlist.js',
   'js/weather.js',
   'manifest.webmanifest',
   'vendor/d3-array.min.js',

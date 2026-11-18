@@ -6,7 +6,7 @@ import { topbar, hearts, emptyState, catBadge, catIcon } from '../ui/components.
 import { icon } from '../ui/icons.js';
 
 const MONTHS_SHORT = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
-const BEST_LABEL = { recipe: 'Bestes Rezept', food: 'Bestes Essen', date: 'Bestes Date', activity: 'Beste Aktivität', trip: 'Beste Reise', gift: 'Bestes Geschenk' };
+const BEST_LABEL = { recipe: 'Bestes Rezept', food: 'Bestes Essen', date: 'Bestes Date', activity: 'Beste Aktivität', trip: 'Beste Reise', gift: 'Bestes Geschenk', movie: 'Bester Film / beste Serie' };
 const mean = (arr) => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null);
 
 export function render(el) {
@@ -43,7 +43,7 @@ export function render(el) {
   const maxC = Math.max(1, ...catCounts.map((x) => x.n));
 
   const best = (cat) => entries.filter((e) => e.data.category === cat && avgRating(e) != null).sort((a, b) => avgRating(b) - avgRating(a))[0];
-  const tops = ['recipe', 'food', 'date', 'activity', 'trip', 'gift'].map((k) => ({ k, e: best(k) })).filter((x) => x.e);
+  const tops = ['recipe', 'food', 'movie', 'date', 'activity', 'trip', 'gift'].map((k) => ({ k, e: best(k) })).filter((x) => x.e);
 
   const byA = entries.filter((e) => e.createdBy === 'a').length;
   const byB = entries.filter((e) => e.createdBy === 'b').length;

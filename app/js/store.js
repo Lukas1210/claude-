@@ -58,12 +58,14 @@ export function all(type) {
 export const allRaw = () => Array.from(items.values());
 
 // ---------- Schreiben ----------
-export async function save(type, data, { id } = {}) {
+// local: true → Eintrag bleibt nur auf diesem Gerät (wird nie hochgeladen), z. B. geheime Geschenkideen.
+export async function save(type, data, { id, local = false } = {}) {
   const now = new Date().toISOString();
   const existing = id ? items.get(id) : null;
+  const isLocal = existing ? !!existing.local : !!local;
   const item = existing
-    ? { ...existing, data: { ...data }, updatedAt: now, dirty: 1, deleted: false }
-    : { id: id || uuid(), type, data: { ...data }, createdAt: now, updatedAt: now, createdBy: me(), deleted: false, dirty: 1 };
+    ? { ...existing, data: { ...data }, updatedAt: now, dirty: isLocal ? 0 : 1, deleted: false }
+    : { id: id || uuid(), type, data: { ...data }, createdAt: now, updatedAt: now, createdBy: me(), deleted: false, dirty: isLocal ? 0 : 1, ...(isLocal ? { local: true } : {}) };
   items.set(item.id, item);
   await itemsDB.put(item);
   emit({ ids: [item.id], types: [type], source: 'local' });
@@ -94,6 +96,12 @@ export async function saveMany(list) {
 export async function remove(id) {
   const it = items.get(id);
   if (!it) return;
+  if (it.local) {
+    items.delete(id);
+    await itemsDB.delete(id);
+    emit({ ids: [id], types: [it.type], source: 'local' });
+    return;
+  }
   const next = { ...it, deleted: true, updatedAt: new Date().toISOString(), dirty: 1 };
   items.set(id, next);
   await itemsDB.put(next);
@@ -101,7 +109,7 @@ export async function remove(id) {
 }
 
 // ---------- Für den Sync ----------
-export const dirtyItems = () => allRaw().filter((it) => it.dirty);
+export const dirtyItems = () => allRaw().filter((it) => it.dirty && !it.local);
 
 export async function markClean(ids, serverTimes = {}) {
   const changed = [];
@@ -138,7 +146,7 @@ export async function applyRemote(remoteItems) {
 /** Backup-Import: Einträge übernehmen (gleiche IDs werden überschrieben, andere bleiben). */
 export async function importItems(list) {
   const now = new Date().toISOString();
-  const out = list.filter((it) => it && it.id && it.type).map((it) => ({ ...it, updatedAt: now, dirty: 1 }));
+  const out = list.filter((it) => it && it.id && it.type).map((it) => ({ ...it, updatedAt: now, dirty: it.local ? 0 : 1 }));
   out.forEach((it) => items.set(it.id, it));
   await itemsDB.putMany(out);
   emit({ ids: out.map((i) => i.id), types: ['*'], source: 'local' });

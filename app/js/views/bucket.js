@@ -8,27 +8,35 @@ import { openSheet, actionSheet, confirmDialog, toast } from '../ui/sheet.js';
 import { sparkBurst } from '../ui/fx.js';
 import { afterPaint } from '../router.js';
 
-const state = { tab: 'open' };
+const state = { tab: 'open', cat: 'all' };
 const wcat = (k) => WISH_CATEGORIES.find((c) => c.key === k) || WISH_CATEGORIES[WISH_CATEGORIES.length - 1];
 
 function paint(el) {
-  const wishes = all('wish');
+  const everything = all('wish');
+  const wishes = state.cat === 'all' ? everything : everything.filter((w) => (w.data.category || 'other') === state.cat);
+  const usedCats = WISH_CATEGORIES.filter((c) => everything.some((w) => (w.data.category || 'other') === c.key));
+  const isWatch = state.cat === 'movie';
   const done = wishes.filter((w) => w.data.done);
   const open = wishes.filter((w) => !w.data.done);
   const list = (state.tab === 'open' ? open : done).sort((a, b) => state.tab === 'open' ? String(b.createdAt).localeCompare(String(a.createdAt)) : String(b.data.doneAt).localeCompare(String(a.data.doneAt)));
   const pct = wishes.length ? Math.round((done.length / wishes.length) * 100) : 0;
 
   el.innerHTML = String(html`
-    ${topbar({ title: 'Bucket-Liste', back: true, right: html`<button class="icon-btn" data-act="add" aria-label="Wunsch hinzufügen">${icon('plus')}</button>` })}
+    ${topbar({ title: isWatch ? 'Watchlist' : 'Bucket-Liste', back: true, right: html`<button class="icon-btn" data-act="add" aria-label="Wunsch hinzufügen">${icon('plus')}</button>` })}
     <div class="page">
-      <h1 class="large-title">Bucket-<em>Liste</em></h1>
-      <p class="page-sub">Was ihr noch zusammen machen wollt.</p>
+      <h1 class="large-title">${isWatch ? html`Watch<em>list</em>` : html`Bucket-<em>Liste</em>`}</h1>
+      <p class="page-sub">${isWatch ? 'Filme und Serien, die ihr noch schauen wollt.' : 'Was ihr noch zusammen machen wollt.'}</p>
+      ${usedCats.length > 1 ? html`
+        <div class="chips" style="margin-bottom:14px">
+          <button class="chip ${state.cat === 'all' ? 'active' : ''}" data-wcat="all">Alle</button>
+          ${usedCats.map((c) => html`<button class="chip ${state.cat === c.key ? 'active' : ''}" data-wcat="${c.key}">${catIcon(c)} ${c.key === 'movie' ? 'Watchlist' : c.label}</button>`)}
+        </div>` : ''}
       ${wishes.length ? html`
         <div class="card" style="margin-bottom:16px">
           <div class="row between" style="margin-bottom:10px"><span><strong>${done.length}</strong> <span class="muted">von ${wishes.length} erledigt</span></span><span class="champ" style="font-weight:600">${pct}%</span></div>
           <div class="progress"><div style="width:${pct}%"></div></div>
         </div>
-        ${open.length ? html`<button class="btn primary block" data-act="surprise" style="margin-bottom:16px">${icon('dice')} Zufall: Was machen wir?</button>` : ''}
+        ${open.length ? html`<button class="btn primary block" data-act="surprise" style="margin-bottom:16px">${icon('dice')} ${isWatch ? 'Zufall: Was schauen wir?' : 'Zufall: Was machen wir?'}</button>` : ''}
         <div class="seg" style="margin-bottom:16px">
           <button class="${state.tab === 'open' ? 'active' : ''}" data-tab="open">Offen · ${open.length}</button>
           <button class="${state.tab === 'done' ? 'active' : ''}" data-tab="done">Erledigt · ${done.length}</button>
@@ -71,12 +79,14 @@ async function complete(w, btn) {
   }
 }
 
-export function render(el) {
+export function render(el, _p, query, opts = {}) {
+  if (!opts.refresh) state.cat = query?.cat && WISH_CATEGORIES.some((c) => c.key === query.cat) ? query.cat : 'all';
   paint(el);
   const onClick = async (e) => {
-    const t = e.target.closest('[data-act], [data-tab], [data-check], [data-edit]');
+    const t = e.target.closest('[data-act], [data-tab], [data-check], [data-edit], [data-wcat]');
     if (!t) return;
     if (t.dataset.tab) { state.tab = t.dataset.tab; paint(el); return; }
+    if (t.dataset.wcat) { state.cat = t.dataset.wcat; paint(el); return; }
     if (t.dataset.check) {
       const w = get(t.dataset.check);
       if (w.data.done) await update(w.id, { done: false, doneAt: null });
@@ -84,19 +94,20 @@ export function render(el) {
       return;
     }
     if (t.dataset.edit) { openWishForm({ id: t.dataset.edit }); return; }
-    if (t.dataset.act === 'add') openWishForm();
-    if (t.dataset.act === 'surprise') surprise();
+    if (t.dataset.act === 'add') openWishForm({ category: state.cat === 'all' ? null : state.cat });
+    if (t.dataset.act === 'surprise') surprise(state.cat === 'all' ? null : state.cat);
   };
   el.addEventListener('click', onClick);
   return () => el.removeEventListener('click', onClick);
 }
 
-async function surprise() {
-  const open = all('wish').filter((w) => !w.data.done);
+/** Zufällige Auswahl aus den offenen Wünschen (optional nur einer Kategorie, z. B. der Watchlist). */
+export async function surprise(cat = null) {
+  const open = all('wish').filter((w) => !w.data.done && (!cat || (w.data.category || 'other') === cat));
   if (!open.length) return;
   let w = open[Math.floor(Math.random() * open.length)];
   const sheet = openSheet({
-    title: 'Wie wär\'s mit …',
+    title: cat === 'movie' ? 'Heute schaut ihr …' : 'Wie wär\'s mit …',
     body: html`
       <div class="center" style="padding:10px 0 6px">
         <div id="sw-em">${catBadge(wcat(w.data.category), { size: 'xl' })}</div>
@@ -124,9 +135,9 @@ async function surprise() {
   });
 }
 
-export function openWishForm({ id = null } = {}) {
+export function openWishForm({ id = null, category = null } = {}) {
   const existing = id ? get(id) : null;
-  const st = { category: existing?.data.category || 'activity' };
+  const st = { category: existing?.data.category || category || 'activity' };
   const sheet = openSheet({
     title: existing ? 'Wunsch bearbeiten' : 'Neuer Wunsch',
     left: html`<button class="text-btn" data-act="cancel">Abbrechen</button>`,

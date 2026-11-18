@@ -112,7 +112,7 @@ export function inSeason(idea, date = new Date()) {
   return true;
 }
 
-const WISH_MAP = { trip: ['plane', 'trip'], food: ['fork', 'food'], recipe: ['chef', 'cook'], activity: ['ticket', 'activity'], date: ['glass', 'date'], other: ['star', 'activity'] };
+const WISH_MAP = { trip: ['plane', 'trip'], food: ['fork', 'food'], recipe: ['chef', 'cook'], activity: ['ticket', 'activity'], date: ['glass', 'date'], movie: ['film', 'movie'], other: ['star', 'activity'] };
 
 /** Eure eigenen Ideen aus den Daten. `items` = { wishes, entries } (aus dem Store). */
 export function ownIdeas({ wishes = [], entries = [] } = {}) {
@@ -120,7 +120,8 @@ export function ownIdeas({ wishes = [], entries = [] } = {}) {
   for (const w of wishes) {
     if (w.data.done) continue;
     const [icon, cat] = WISH_MAP[w.data.category] || WISH_MAP.other;
-    out.push({ id: `wish:${w.id}`, title: w.data.title, text: w.data.note || 'Steht auf eurer Bucket-Liste.', icon, where: w.data.category === 'recipe' ? 'home' : 'any', sky: 'any', budget: null, moods: [], dur: null, cat, source: 'bucket', ref: w.id });
+    const movie = w.data.category === 'movie';
+    out.push({ id: `wish:${w.id}`, title: movie ? `Schauen: ${w.data.title}` : w.data.title, text: w.data.note || (movie ? 'Steht auf eurer Watchlist.' : 'Steht auf eurer Bucket-Liste.'), icon, where: w.data.category === 'recipe' || movie ? 'home' : 'any', sky: movie ? 'in' : 'any', budget: movie ? 0 : null, moods: movie ? ['gemuetlich'] : [], dur: movie ? 'evening' : null, cat, source: movie ? 'watchlist' : 'bucket', ref: w.id });
   }
   for (const e of entries) {
     if (e.data.category === 'food' && e.data.extra?.again === 'yes') {
@@ -133,7 +134,7 @@ export function ownIdeas({ wishes = [], entries = [] } = {}) {
   return out;
 }
 
-export const SOURCE_LABEL = { library: 'Idee', bucket: 'Von eurer Bucket-Liste', restaurant: 'Euer Restaurant-Tipp', recipe: 'Euer Rezept' };
+export const SOURCE_LABEL = { library: 'Idee', bucket: 'Von eurer Bucket-Liste', watchlist: 'Von eurer Watchlist', restaurant: 'Euer Restaurant-Tipp', recipe: 'Euer Rezept' };
 
 /** Passt eine Idee zu den Filtern? */
 export function matches(idea, f = {}, date = new Date()) {

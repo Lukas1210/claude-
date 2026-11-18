@@ -8,6 +8,7 @@ export const CATEGORIES = {
   activity: { key: 'activity', label: 'Aktivität', plural: 'Aktivitäten', emoji: '🎟️', icon: 'ticket', color: 'var(--c-activity)', hint: 'Ausflüge, Konzerte, Sport …' },
   food: { key: 'food', label: 'Essen', plural: 'Essen', emoji: '🍽️', icon: 'fork', color: 'var(--c-food)', hint: 'Restaurants, Cafés & Lieferdienste' },
   recipe: { key: 'recipe', label: 'Rezept', plural: 'Rezepte', emoji: '🍳', icon: 'chef', color: 'var(--c-recipe)', hint: 'Selbst gekocht und gebacken', noPlace: true },
+  movie: { key: 'movie', label: 'Film & Serie', plural: 'Filme & Serien', emoji: '🎬', icon: 'film', color: 'var(--c-movie)', hint: 'Gemeinsam geschaut – im Kino oder auf der Couch', noPlace: true },
   trip: { key: 'trip', label: 'Reise', plural: 'Reisen', emoji: '✈️', icon: 'plane', color: 'var(--c-trip)', hint: 'Urlaube & Wochenendtrips' },
   gift: { key: 'gift', label: 'Geschenk', plural: 'Geschenke', emoji: '🎁', icon: 'gift', color: 'var(--c-gift)', hint: 'Was ihr euch geschenkt habt' },
 };
@@ -19,6 +20,8 @@ const TRANSPORT = ['✈️ Flug', '🚆 Zug', '🚗 Auto', '🚌 Bus', '⛴️ F
 const MEALS = ['🥐 Frühstück', '🥗 Mittag', '🍷 Abendessen', '🍰 Café & Kuchen', '🍸 Drinks', '🛵 Bestellt'];
 const COURSES = ['🥐 Frühstück', '🥗 Vorspeise', '🍝 Hauptgericht', '🥦 Beilage', '🍰 Dessert', '🧁 Gebacken', '🍿 Snack', '🍹 Getränk'];
 const DIFFICULTY = ['🙂 Einfach', '👌 Mittel', '🧑‍🍳 Anspruchsvoll'];
+const MOVIE_KINDS = ['🎬 Film', '📺 Serie', '🎞️ Doku', '🎌 Anime'];
+export const PLATFORMS = ['Kino', 'Netflix', 'Prime Video', 'Disney+', 'Apple TV+', 'WOW', 'RTL+', 'Joyn', 'Mediathek', 'Sonstiges'];
 
 /** Kategorie-spezifische Felder. type: text | textarea | select | price | money | yesno | partner | toggle */
 export const EXTRA_FIELDS = {
@@ -49,6 +52,13 @@ export const EXTRA_FIELDS = {
     { key: 'tips', label: 'Unsere Tipps & Änderungen', type: 'textarea', rows: 3, placeholder: 'Was würden wir beim nächsten Mal anders machen?' },
     { key: 'source', label: 'Quelle', type: 'text', placeholder: 'Link, Kochbuch oder Oma 😉' },
     { key: 'again', label: 'Nochmal kochen?', type: 'yesno' },
+  ],
+  movie: [
+    { key: 'kind', label: 'Art', type: 'select', options: MOVIE_KINDS },
+    { key: 'platform', label: 'Wo geschaut', type: 'select', options: PLATFORMS },
+    { key: 'genre', label: 'Genre', type: 'text', placeholder: 'z. B. Thriller, Komödie' },
+    { key: 'season', label: 'Staffel/Folge', type: 'text', placeholder: 'z. B. Staffel 2' },
+    { key: 'again', label: 'Empfehlen?', type: 'yesno' },
   ],
   trip: [
     { key: 'transport', label: 'Anreise', type: 'select', options: TRANSPORT },
@@ -88,6 +98,7 @@ export const WISH_CATEGORIES = [
   { key: 'recipe', emoji: '🍳', icon: 'chef', color: 'var(--c-recipe)', label: 'Rezept' },
   { key: 'activity', emoji: '🎟️', icon: 'ticket', color: 'var(--c-activity)', label: 'Erlebnis' },
   { key: 'date', emoji: '🍸', icon: 'glass', color: 'var(--c-date)', label: 'Date' },
+  { key: 'movie', emoji: '🎬', icon: 'film', color: 'var(--c-movie)', label: 'Film/Serie' },
   { key: 'other', emoji: '✨', icon: 'sparkles', color: 'var(--c-milestone)', label: 'Sonstiges' },
 ];
 
