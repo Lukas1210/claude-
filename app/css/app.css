@@ -1292,3 +1292,63 @@ img[data-photo].loaded { opacity: 1; }
 .gw-sub { display: block; font-size: 13px; color: var(--text2); margin-top: 2px; }
 .gw-res { display: block; font-size: 12.5px; color: var(--ok); font-weight: 600; margin-top: 3px; }
 .gw.res .gw-title { color: var(--text2); }
+
+/* ---------- Duell & Rangliste ---------- */
+.duel-hero { display: flex; align-items: center; gap: 16px; padding: 18px; border-radius: 24px; background: var(--hero-gradient), var(--hero-bg); color: var(--hero-text); position: relative; overflow: hidden; }
+.duel-hero .kicker, .duel-hero .muted { color: var(--hero-sub) !important; }
+.duel-title { font-family: var(--font-display); font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin-top: 4px; line-height: 1.1; }
+.ring-wrap { position: relative; width: 112px; height: 112px; flex: none; }
+.ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: rgba(255, 255, 255, .14); stroke-width: 10; }
+.ring-fg { fill: none; stroke: var(--hero-num); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset .9s var(--ease); }
+.ring-num { position: absolute; inset: 0; display: flex; align-items: baseline; justify-content: center; padding-top: 36px; font-family: var(--font-display); font-weight: 700; }
+.ring-num b { font-size: 34px; color: var(--hero-num); line-height: 1; }
+.ring-num span { font-size: 16px; margin-left: 1px; color: var(--hero-sub); }
+.hot { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: var(--radius-md); background: var(--bg-elev); border: 0.5px solid var(--card-border); box-shadow: var(--card-shadow); color: var(--text); }
+.hot-scores { display: flex; align-items: center; gap: 8px; flex: none; }
+.hot-scores > span:not(.hot-diff) { display: flex; flex-direction: column; align-items: center; min-width: 40px; }
+.hot-scores small { font-size: 11px; color: var(--text2); }
+.hot-scores b { font-family: var(--font-display); font-size: 20px; line-height: 1.1; }
+.hot-diff { font-size: 12px; font-weight: 700; color: var(--accent2); padding: 3px 7px; border-radius: 8px; background: var(--accent2-soft); }
+.tiers { display: flex; flex-direction: column; gap: 8px; }
+.tier-row { display: flex; gap: 8px; align-items: stretch; }
+.tier-label { width: 64px; flex: none; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #0b0b0c; padding: 6px 2px; }
+.tier-label b { font-family: var(--font-display); font-size: 28px; line-height: 1; }
+.tier-label small { font-size: 11px; font-weight: 600; opacity: .8; text-align: center; line-height: 1.1; }
+.t-S { background: #f0b44c; } .t-A { background: #7fd1ae; } .t-B { background: #8db7f5; } .t-C { background: #c9b6f2; } .t-D { background: #e6a4a4; }
+.tier-items { flex: 1; min-width: 0; display: flex; gap: 8px; overflow-x: auto; padding: 6px; border-radius: 14px; background: var(--fill); scrollbar-width: none; min-height: 100px; align-items: center; }
+.tier-items::-webkit-scrollbar { display: none; }
+.tier-item { width: 76px; flex: none; display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--text); }
+.tier-thumb { width: 60px; height: 60px; border-radius: 12px; overflow: hidden; background: var(--bg-elev); display: grid; place-items: center; }
+.tier-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.tier-name { font-size: 11px; line-height: 1.15; max-width: 74px; text-align: center; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.tier-score { font-size: 11px; font-weight: 700; color: var(--text2); }
+
+/* ---------- Erfolge ---------- */
+.streak-card { display: flex; gap: 14px; align-items: center; padding: 16px; border-radius: 22px; background: var(--hero-gradient), var(--hero-bg); color: var(--hero-text); margin-bottom: 16px; }
+.streak-card .kicker, .streak-card .muted { color: var(--hero-sub) !important; }
+.streak-ico { width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; background: rgba(var(--brand-rgb), .2); color: var(--hero-num); flex: none; }
+.streak-ico svg { width: 28px; height: 28px; }
+.streak-num { font-family: var(--font-display); font-size: 24px; font-weight: 700; margin-top: 2px; line-height: 1.1; }
+.award-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.award { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 12px 6px; border-radius: var(--radius-md); background: var(--bg-elev); border: 0.5px solid var(--card-border); box-shadow: var(--card-shadow); color: var(--text); text-align: center; width: 100%; }
+.award-ring { position: relative; width: 64px; height: 64px; }
+.award-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.award .ring-bg { stroke: var(--fill2); stroke-width: 6; }
+.award .ring-fg { stroke: var(--text3); stroke-width: 6; }
+.award.t1 .ring-fg { stroke: #c98a5b; } .award.t2 .ring-fg { stroke: #9aa3b1; } .award.t3 .ring-fg { stroke: #e2b33b; }
+.award-ico { position: absolute; inset: 0; display: grid; place-items: center; color: var(--text3); }
+.award-ico svg { width: 26px; height: 26px; }
+.award.t1 .award-ico { color: #b9784a; } .award.t2 .award-ico { color: #8c96a5; } .award.t3 .award-ico { color: #d9a21e; }
+.award-title { font-size: 13px; font-weight: 700; line-height: 1.2; margin-top: 4px; }
+.award-tier { font-size: 11.5px; font-weight: 600; color: var(--text2); }
+.award-sub { font-size: 11px; color: var(--text3); }
+.award.t0 { opacity: .8; }
+.award-detail { width: 140px; margin: 0 auto; }
+.tier-dot { width: 14px; height: 14px; border-radius: 50%; flex: none; }
+.tier-dot.t1 { background: #c98a5b; } .tier-dot.t2 { background: #9aa3b1; } .tier-dot.t3 { background: #e2b33b; }
+.discover { gap: 10px; }
+.disc { width: 152px; display: flex; flex-direction: column; gap: 4px; padding: 14px; border-radius: var(--radius); background: var(--bg-elev); border: 0.5px solid var(--card-border); box-shadow: var(--card-shadow); color: var(--text); }
+.disc .cat-badge { margin-bottom: 8px; }
+.disc b { font-family: var(--font-display); font-size: 17px; letter-spacing: -0.01em; }
+.disc > span:last-child { font-size: 12.5px; color: var(--text2); line-height: 1.3; }

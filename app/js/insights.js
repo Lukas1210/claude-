@@ -118,3 +118,79 @@ export function funFacts({ entries = [], photos = 0, startDate = null, home = nu
   if (cats[0]?.n > 2) facts.push(`Am häufigsten tragt ihr ${cats[0].c.plural} ein: ${cats[0].n} Stück.`);
   return facts;
 }
+
+// ---------- Duell & Rangliste ----------
+
+/** Erlebnisse, bei denen ihr am weitesten auseinanderliegt. */
+export function controversial(entries, n = 5) {
+  return entries
+    .map((e) => ({ e, a: ratingValue(e, 'a'), b: ratingValue(e, 'b') }))
+    .filter((x) => x.a != null && x.b != null && x.a !== x.b)
+    .map((x) => ({ ...x, diff: Math.abs(x.a - x.b) }))
+    .sort((x, y) => y.diff - x.diff || String(y.e.data.date).localeCompare(String(x.e.data.date)))
+    .slice(0, n);
+}
+
+/** Einigkeit je Kategorie (nur Kategorien mit mindestens einem gemeinsam bewerteten Eintrag). */
+export function agreementByCategory(entries) {
+  return Object.values(CATEGORIES).map((c) => {
+    const r = ratingStats(entries.filter((e) => e.data.category === c.key));
+    return { c, both: r.both, agreement: r.agreement };
+  }).filter((x) => x.both > 0).sort((a, b) => b.agreement - a.agreement);
+}
+
+/** Lieblingskategorie einer Person: höchster Schnitt bei mindestens `min` eigenen Bewertungen. */
+export function favoriteCategory(entries, slot, min = 2) {
+  let best = null;
+  for (const c of Object.values(CATEGORIES)) {
+    const vals = entries.filter((e) => e.data.category === c.key).map((e) => ratingValue(e, slot)).filter((v) => v != null);
+    if (vals.length < min) continue;
+    const avg = mean(vals);
+    if (!best || avg > best.avg) best = { c, avg, n: vals.length };
+  }
+  return best;
+}
+
+export const TIERS = [
+  { key: 'S', min: 4.75, label: 'Legendär' },
+  { key: 'A', min: 4, label: 'Top' },
+  { key: 'B', min: 3, label: 'Gut' },
+  { key: 'C', min: 2, label: 'Geht so' },
+  { key: 'D', min: 0, label: 'Lieber nicht' },
+];
+
+/** Rangliste nach Ø-Herzen: { S: [...], A: [...], … } (bestbewertete zuerst). */
+export function tierList(entries) {
+  const out = Object.fromEntries(TIERS.map((t) => [t.key, []]));
+  for (const e of entries) {
+    const avg = avgRating(e);
+    if (avg == null) continue;
+    out[TIERS.find((t) => avg >= t.min).key].push(e);
+  }
+  for (const k of Object.keys(out)) out[k].sort((a, b) => avgRating(b) - avgRating(a) || String(b.data.date).localeCompare(String(a.data.date)));
+  return out;
+}
+
+// ---------- Serien ----------
+const monthKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+
+/** Monate in Folge mit mindestens einem Erlebnis. current zählt bis zum Vormonat weiter, solange dieser Monat noch läuft. */
+export function monthStreak(entries, todayStr) {
+  const months = new Set(entries.map((e) => String(e.data.date || '').slice(0, 7)).filter((k) => k.length === 7));
+  const t = todayStr ? new Date(`${todayStr}T12:00:00`) : new Date();
+  const cur = new Date(t.getFullYear(), t.getMonth(), 1);
+  const thisMonth = months.has(monthKey(cur));
+  let current = 0;
+  const d = new Date(cur);
+  if (!thisMonth) d.setMonth(d.getMonth() - 1);
+  while (months.has(monthKey(d))) { current++; d.setMonth(d.getMonth() - 1); }
+  let best = 0, run = 0, prev = null;
+  for (const k of [...months].sort()) {
+    const [y, m] = k.split('-').map(Number);
+    const idx = y * 12 + m;
+    run = prev != null && idx === prev + 1 ? run + 1 : 1;
+    best = Math.max(best, run);
+    prev = idx;
+  }
+  return { current, best, thisMonth };
+}

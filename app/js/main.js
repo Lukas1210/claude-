@@ -24,6 +24,8 @@ const views = {
   ideas: () => import('./views/dateideas.js'),
   lists: () => import('./views/lists.js'),
   wishlist: () => import('./views/wishlist.js'),
+  duel: () => import('./views/duel.js'),
+  awards: () => import('./views/awards.js'),
 };
 
 route('/', views.home, { tab: 'home', root: true });
@@ -41,6 +43,8 @@ route('/settings', views.settings, { tab: 'home', fab: false });
 route('/ideas', views.ideas, { tab: 'home', fab: false });
 route('/lists', views.lists, { tab: 'home', fab: false });
 route('/wishlist', views.wishlist, { tab: 'home', fab: false });
+route('/duel', views.duel, { tab: 'home', fab: false });
+route('/achievements', views.awards, { tab: 'home', fab: false });
 
 const TAB_DEF = [
   { tab: 'home', path: '/', label: 'Wir', icon: 'home' },

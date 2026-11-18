@@ -15,7 +15,10 @@ import { dateNudge, freeSlots, slotLabel } from '../dateplan.js';
 import { pickIdea } from '../ideas.js';
 import { ideaPool, ideaBadge, openDatePlanner } from './dateplanner.js';
 import { myOpenTodos, openTodos } from './lists.js';
-import { refresh } from '../router.js';
+import { refresh, go } from '../router.js';
+import { currentResults, checkUnlocks } from './awards.js';
+import { TIER_NAMES } from '../achievements.js';
+import { toast } from '../ui/sheet.js';
 
 const DAY_MILESTONES = (() => {
   const s = new Set([100, 200, 300, 500, 666, 777, 888]);
@@ -268,6 +271,16 @@ export function render(el) {
       </div>
 
       <div class="section">
+        <div class="section-head"><h2 class="section-title">Entdecken</h2></div>
+        <div class="h-scroll discover">
+          <a class="disc card-link" href="#/ideas"><span class="cat-badge lg" style="--c:var(--accent2)">${icon('dice')}</span><b>Zufalls-Date</b><span>Würfeln: Was machen wir?</span></a>
+          <a class="disc card-link" href="#/duel"><span class="cat-badge lg" style="--c:var(--c-date)">${icon('swords')}</span><b>Duell</b><span>${rs.agreement != null && rs.both ? `${rs.agreement} % einig` : 'Wer bewertet strenger?'}</span></a>
+          <a class="disc card-link" href="#/duel?tab=tiers"><span class="cat-badge lg" style="--c:var(--c-trip)">${icon('trophy')}</span><b>Rangliste</b><span>Von S bis D</span></a>
+          <a class="disc card-link" href="#/achievements"><span class="cat-badge lg" style="--c:var(--c-recipe)">${icon('flame')}</span><b>Erfolge</b><span>${(() => { const r = currentResults().results; return `${r.filter((x) => x.tier).length} von ${r.length} freigeschaltet`; })()}</span></a>
+        </div>
+      </div>
+
+      <div class="section">
         <div class="section-head"><h2 class="section-title">Bereiche</h2></div>
         <a class="tile wide card-link" href="#/entries?cat=recipe">
           <span class="cat-badge lg" style="--c:var(--c-recipe)">${icon('chef')}</span>
@@ -278,7 +291,6 @@ export function render(el) {
           <span class="faint">${icon('chevron')}</span>
         </a>
         <div class="card-grid">
-          ${tile('#/ideas', 'dice', 'var(--accent2)', 'Date-Ideen', 'Würfeln: Was machen wir?')}
           ${tile('#/lists', 'todo', 'var(--c-trip)', 'Listen', todoOpen || shopOpen ? `${todoOpen} To-dos · ${shopOpen} Einkauf` : 'To-dos & Einkauf')}
           ${tile('#/wishlist', 'gift', 'var(--c-gift)', 'Wunschzettel', (() => { const n = all('giftwish').filter((w) => w.data.owner !== me()).length; return n ? `${n} ${n === 1 ? 'Wunsch' : 'Wünsche'} von ${partnerName}` : 'Wünsche & geheime Ideen'; })())}
           ${tile('#/bucket', 'star', 'var(--accent2)', 'Bucket-Liste', wishes.length ? `${wishDone} von ${wishes.length} erledigt` : 'Was ihr noch machen wollt')}
@@ -297,6 +309,13 @@ export function render(el) {
     </div>`);
 
   if (Date.now() - countedAt > 60000) { countUpAll(el); countedAt = Date.now(); }
+  // Neue Erfolgs-Stufen einmalig melden
+  checkUnlocks().then((fresh) => {
+    if (!fresh.length) return;
+    const best = fresh.sort((a, b) => b.tier - a.tier)[0];
+    confetti(70);
+    toast(fresh.length === 1 ? `Erfolg: ${best.def.title} · ${TIER_NAMES[best.tier]}` : `${fresh.length} neue Erfolge – z. B. ${best.def.title}`, { icon: 'trophy', actionLabel: 'Ansehen', duration: 5000, onAction: () => go('/achievements') });
+  }).catch(() => {});
 
   const onClick = async (e) => {
     const sl = e.target.closest('[data-nudge-slot]');

@@ -62,6 +62,11 @@ export function render(el) {
       <h1 class="large-title">Eure <em>Zahlen</em></h1>
       <p class="page-sub">Alles, was ihr erlebt habt – in Zahlen.</p>
 
+      <div class="row" style="gap:8px;margin-bottom:14px">
+        <a class="btn small grow" href="#/duel">${icon('swords')} Duell</a>
+        <a class="btn small grow" href="#/duel?tab=tiers">${icon('trophy')} Rangliste</a>
+        <a class="btn small grow" href="#/achievements">${icon('flame')} Erfolge</a>
+      </div>
       <div class="stat-grid">
         <div class="stat"><b>${fmtNumber(entries.length)}</b><span>Erlebnisse</span></div>
         <div class="stat"><b>${fmtNumber(photos.length)}</b><span>Fotos</span></div>

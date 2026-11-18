@@ -22,7 +22,9 @@ Euer gemeinsames Journal fürs iPhone: Dates, Aktivitäten, Essen, selbst gekoch
 | **Timeline** | Ab Tag 1: Meilensteine mit Fotos, alle Erlebnisse und automatische Jahrestage sowie runde Tageszahlen. |
 | **Bucket-Liste** | Was ihr noch machen wollt. Erledigt wird daraus ein Erlebnis; „Zufall: Was machen wir?“ wählt einen offenen Wunsch aus. |
 | **Briefe** | Nachrichten aneinander, auch als **Zeitkapsel**, die sich erst ab einem Datum öffnen lässt. |
-| **Statistik** | Wer bewertet strenger, wie einig seid ihr euch, Bestenlisten und eure Aktivität pro Monat. |
+| **Statistik** | Eure Zahlen, Bestenlisten und eure Aktivität pro Monat. |
+| **Geschmacks-Duell & Rangliste** | Wie einig seid ihr euch (in %), wer bewertet strenger, eure Lieblingskategorien und die umstrittensten Erlebnisse. Dazu eine **Rangliste** von S bis D – insgesamt oder pro Kategorie. |
+| **Erfolge & Serien** | 18 Abzeichen in Bronze, Silber und Gold (Länder, Kilometer, Restaurants, Rezepte, Filme, Fotos, „Ein Herz und eine Seele“ …) und eure Serie: Monate in Folge mit mindestens einem Erlebnis. Neue Stufen werden mit Konfetti gemeldet. |
 | **Farbwelten** | Nachtblau & Gold (Standard), Petrol & Koralle, Indigo, Polaroid oder Schwarz & Neon – unter Einstellungen → Farbwelt, für jedes iPhone einzeln. „Automatisch“ folgt dem Hell-/Dunkelmodus des iPhones. |
 | **Sync & offline** | Beide iPhones sehen dieselben Daten. Die App funktioniert ohne Netz und überträgt Änderungen später. Dazu gibt es ein Backup als Datei. |
 
@@ -95,6 +97,7 @@ cd app && python3 -m http.server 8000   # lokal starten → http://localhost:800
 node tools/e2e/run.cjs                   # End-to-End-Tests im iPhone-Format (Playwright/Chromium)
 node tools/e2e/run.cjs tour palettes     # Screenshot-Rundgang & Farbwelt-Vorschau → tools/e2e/shots/
 node tools/test-sync.mjs                 # Sync-Tests mit zwei simulierten iPhones
+node tools/test-insights.mjs             # Unit-Tests: Auswertungen, Erfolge, Ideen, Wetter
 python3 tools/palettes/generate.py       # Farbwelten prüfen (Kontraste) und css/palettes.css erzeugen
 node tools/make-icons.mjs                # App-Icon & iOS-Startbilder neu erzeugen
 node tools/update-sw.mjs                 # Offline-Dateiliste im Service Worker aktualisieren
