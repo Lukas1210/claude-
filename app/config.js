@@ -4,4 +4,4 @@
 window.CJ_CONFIG = {
   supabaseUrl: '',      // z. B. 'https://abcdefghijkl.supabase.co'
   supabaseAnonKey: '',  // Project Settings → API Keys → „anon public“ oder „publishable“
-};
+};sb_publishable_oq6X4pul39mX2RrV8mz2pQ_GCWsx2zk
