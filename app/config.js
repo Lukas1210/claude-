@@ -3,5 +3,5 @@
 // eure Daten schützt der Login (E-Mail + Passwort) zusammen mit den Regeln aus supabase/setup.sql.
 window.CJ_CONFIG = {
   supabaseUrl: '',      // z. B. 'https://abcdefghijkl.supabase.co'
-  supabaseAnonKey: '',  // Project Settings → API Keys → sb_publishable_oq6X4pul39mX2RrV8mz2pQ_GCWsx2zk
+  supabaseAnonKey: 'sb_publishable_oq6X4pul39mX2RrV8mz2pQ_GCWsx2zk
 };
